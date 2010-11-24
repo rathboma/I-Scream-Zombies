@@ -1,0 +1,77 @@
+Actions
+	Post join_game (name)
+		returns
+			UUID (which is a key for a particular player in a particular game)
+
+	Get turn(uuid)
+		returns
+			true or false
+	Get Get_game_state (uuid)
+		returns
+			game status in JSON
+				:game_board = {
+					:size = [x,y]
+					:known = {
+						:x,
+						:y,
+						:zombies = int,
+						:customers = [
+							{	:id,
+								:favorite_type = [C,C,S, etc],
+								:favorite_price,
+								:favorite_number,
+							}, {cust2}, ..., {custN}
+						]
+					}
+				},
+				:players = {
+					:you => { #player obj
+						:x = int,
+						:y = int,
+						:score = float,
+						:money = float,
+						:inventory = {
+							:vanilla = int,
+							:chocolate = int,
+							:strawberry = int,
+						},
+						:kills = int,
+						:sales = int,
+						:turns_remaining = int,
+						:can_act = boolean,
+						:can_move = boolean,
+					},
+					:other => [{} ... {}] of other player objects
+				},
+				:your_turn = boolean,
+				:game_over = boolean,
+				:win = boolean
+			}
+				or
+			error (if uuid is unmatched)
+	Post Make_move (uuid, x, y)
+		returns {
+					:tile = {
+						:customers = [{}, {}, {}], #see above
+						:zombies = int,
+						:store = boolean,
+					},
+					:player = #player
+				}
+	
+	Post perform_action (uuid, type, details)
+		type can be "nothing"
+			"kill"
+			"sell"
+			"run"
+		additional details
+			nothing for kill
+			nothing for run
+			for sell:
+				[{custID=int, flavors=[C,C,S], number=int} ... {}]
+			for buy:
+				[{itemName, number} ... {}]
+		returns {
+					:current_tile = #tiledetails
+					:player = #player obj,
+				}
