@@ -17,11 +17,29 @@ public class ZombieGame extends Platform {
 	
 	public void setup(){
 
-		Config.minimap  = new RectThing(getWidth() - 210, 10, 200, 200);
+		Config.platform = this;
+		Config.minimap  = new RectThing(getWidth() - 210, 10, 175, 175);
 		Config.minimap.makeStatic();
-		Config.minimap.setColor(Color.gray);
+		Config.minimap.setColor(Color.black);
 		addThing(Config.minimap);
+		for(int x = 0; x < 25; x++){
+			for(int y = 0; y < 25; y++){
+				tiles[x][y] = new Tile(x, y);
+			}
+		}
 		
+		Player player = Config.player = new Player();
+		player.setPosition(13, 13);
+		Tile tile = tiles[13][13];
+		tiles[13][13].discover();
+		setFocus(13, 13); //sets the camera focus on the central tile.
+		
+		
+	}
+	
+	private void setFocus(int x, int y){
+		
+		//do stuff here.
 	}
 	
 	public void update(){

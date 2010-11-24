@@ -7,14 +7,17 @@ import java.util.*;
 
 public class Tile{
 	
-	int bigSize = 40;
-	int smallSize = 4;
-	int bigGap = 8;
-	int smallGap = 1;
+	int bigSize = 75;
+	int smallSize = 5;
+	int bigGap = 10;
+	int smallGap = 2;
+	
+	int smallTot = smallSize + smallGap;
+	int bigTot = bigSize + bigGap;
 	
 	public int card;
-	public Zombie[] zombies;
-	public Customer[] customers;
+	public Zombie[] zombies = null;
+	public Customer[] customers = null;
 	ModifierBase modifier = null;
 	
 	
@@ -25,12 +28,28 @@ public class Tile{
 		
 		Coordinate miniStart = Config.minimap.topLeft();
 		
+		bigTile = new RectThing((xPos*bigTot), yPos*bigTot, bigSize, bigSize);
+		Config.platform.addThing(bigTile);
+				
+		smallTile = new RectThing((xPos*smallTot) + miniStart.x, miniStart.y + (yPos*smallTot), smallSize, smallSize);
+		smallTile.makeStatic();
+		Config.platform.addThing(smallTile);
+		
+
+		
+		
 		modifier = Randomizer.getModifier();
 		if(modifier == null){
 			customers = Randomizer.getCustomers(); //totally random
 			zombies = Randomizer.getZombies(customers); //may be based on the number of people
 		}
 		
+			
+	}
+	
+	public void discover(){
+		smallTile.setColor(Color.gray);
+		bigTile.setColor(Color.lightGray);
 	}
 
 	
