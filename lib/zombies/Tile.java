@@ -29,6 +29,7 @@ public class Tile{
 		Coordinate miniStart = Config.minimap.topLeft();
 		
 		bigTile = new RectThing((xPos*bigTot), yPos*bigTot, bigSize, bigSize);
+		bigTile.makeStatic();
 		Config.platform.addThing(bigTile);
 				
 		smallTile = new RectThing((xPos*smallTot) + miniStart.x, miniStart.y + (yPos*smallTot), smallSize, smallSize);
