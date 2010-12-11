@@ -1,10 +1,12 @@
 Actions
 	Post join_game (name)
 		returns
+		{uuid : <UUID>}
 			UUID (which is a key for a particular player in a particular game)
 
 	Get turn(uuid)
 		returns
+		{turn:true}
 			true or false
 	Get Get_game_state (uuid)
 		returns
@@ -14,6 +16,8 @@ Actions
 					:known = [{
 						:x,
 						:y,
+						:store => t/f,
+
 						:store,
 						:zombies = int,
 						:customers = [
