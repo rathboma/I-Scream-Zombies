@@ -4,6 +4,8 @@ class CreatePlayers < ActiveRecord::Migration
       t.column :uuid, :string, :unique => true
       t.column :x, :int
       t.column :y, :int
+      t.column :prev_x, :int
+      t.column :prev_y, :int
       t.column :money, :double
       t.column :vanilla, :int
       t.column :chocolate, :int
