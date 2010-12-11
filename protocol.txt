@@ -11,9 +11,10 @@ Actions
 			game status in JSON
 				:game_board = {
 					:size = [x,y]
-					:known = {
+					:known = [{
 						:x,
 						:y,
+						:store,
 						:zombies = int,
 						:customers = [
 							{	:id,
@@ -22,7 +23,7 @@ Actions
 								:favorite_number,
 							}, {cust2}, ..., {custN}
 						]
-					}
+					}...]
 				},
 				:players = {
 					:you => { #player obj
