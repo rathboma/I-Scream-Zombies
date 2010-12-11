@@ -17,6 +17,8 @@ Actions
 						:x,
 						:y,
 						:store => t/f,
+
+						:store,
 						:zombies = int,
 						:customers = [
 							{	:id,
@@ -25,7 +27,7 @@ Actions
 								:favorite_number,
 							}, {cust2}, ..., {custN}
 						]
-					}
+					}...]
 				},
 				:players = {
 					:you => { #player obj
