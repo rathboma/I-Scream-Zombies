@@ -1,5 +1,5 @@
 Actions
-	Post join_game (name)
+	Post join_game (name, ai)
 		returns
 		{uuid : <UUID>}
 			UUID (which is a key for a particular player in a particular game)
@@ -17,14 +17,14 @@ Actions
 						:x,
 						:y,
 						:store => t/f,
-
-						:store,
 						:zombies = int,
 						:customers = [
-							{	:id,
-								:favorite_type = [C,C,S, etc],
+							{	
+								:id,
+								:favorite_type = "C,S,V",
 								:favorite_price,
-								:favorite_number,
+								:favorite_number, (-1 indicates unlimited)
+								
 							}, {cust2}, ..., {custN}
 						]
 					}...]
@@ -33,6 +33,8 @@ Actions
 					:you => { #player obj
 						:x = int,
 						:y = int,
+						:prev_x = int,
+						:prev_y = int,
 						:score = float,
 						:money = float,
 						:vanilla = int,
@@ -49,6 +51,16 @@ Actions
 				:your_turn = boolean,
 				:game_over = boolean,
 				:win = boolean
+				:costs => {
+					"V" => 1,
+					"C" => 2,
+					"S" => 3
+				}
+				:base_prices => {
+					"V" => 2
+					"C" => 3
+					"S" => 4
+				}
 			}
 				or
 			error (if uuid is unmatched)
@@ -61,20 +73,21 @@ Actions
 					},
 					:player = #player
 				}
-	
-	Post perform_action (uuid, type, details)
-		type can be "nothing"
-			"kill"
-			"sell"
-			"run"
-		additional details
-			nothing for kill
-			nothing for run
-			for sell:
-				[{custID=int, flavors=[C,C,S], number=int} ... {}]
-			for buy:
-				[{itemName, number} ... {}]
-		returns {
-					:current_tile = #tiledetails
-					:player = #player obj,
-				}
+		OR:
+		{
+			:error = "Reason for error"
+		}
+
+
+	post Buy
+		params: flavor, number
+		returns tile, player
+	post sell
+		params: flavors, number, customer_id
+		returns tile, player
+	post kill
+		params: none
+		returns tile, player
+	post run
+		params: none
+		returns tile, player
