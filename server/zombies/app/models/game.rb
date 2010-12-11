@@ -3,6 +3,9 @@ class Game < ActiveRecord::Base
   
   has_one :game_board, :foreign_key => :game_board_id
   
+  COSTS = { "V" => 1, "C" => 2, "S" => 3 }
+  PRICES = { "V" => 1.5, "C" => 4, "S" => 4.5 }
+  
   def move_error
     return @error
   end
@@ -44,6 +47,19 @@ class Game < ActiveRecord::Base
     #try to find tile
     # if tile doesn't exist - generate tile, save it
     # return tile
+    
+  end
+  
+  def buy(player, flavor, num)
+    
+    # validate the player is on a store
+    # validate the player has enough money
+    
+    if player.money >= PRICES[flavor]*num
+      #ok
+    else
+      #not ok
+    end
     
   end
   

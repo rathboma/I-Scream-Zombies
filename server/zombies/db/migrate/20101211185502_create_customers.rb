@@ -7,7 +7,7 @@ class CreateCustomers < ActiveRecord::Migration
       t.column :tile_id, :int
       t.timestamps
     end
-    add_index :tile, :tile_id
+    add_index :customers, :tile_id
   end
 
   def self.down

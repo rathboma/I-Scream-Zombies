@@ -6,8 +6,8 @@ class JsonGame
     @game_board = game_board
     @game_over = game_over
     @win = win
-    @costs = { "V" => 1, "C" => 2, "S" => 3 }
-    @prices = { "V" => 1.5, "C" => 4, "S" => 4.5 }
+    @costs = Game.COSTS
+    @prices = Game.PRICES
   end
   
 end
