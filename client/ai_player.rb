@@ -4,15 +4,23 @@ require 'net/http'
 
 module AIPlayer
 	class Client
-		attr_accessor :board, :player, :others
+		attr_accessor :board, :player, :others, :base_prices, :costs
 		def initialize()
 		end
 
 		def make_move(gamestate)
-			@board = AIPlayer::Board.new(gamestate[:board])
-			@player = AIPlayer::Player.new(gamestate[:players][:you], :self)
-			@others = gamestate[:players][:others].map{|o| AIPlayer::Player.new(o)}
-			choose_move!
+			if !gamestate[:game_over] && gamestate[:your_turn]
+				@base_prices = {	"V" => gamestate[:base_prices]["V"],
+									"C" => gamestate[:base_prices]["C"],
+									"S" => gamestate[:base_prices]["S"] }
+				@costs = {	"V" => gamestate[:costs]["V"],
+							"C" => gamestate[:costs]["C"],
+							"S" => gamestate[:costs]["S"] }
+				@board = AIPlayer::Board.new(gamestate[:board])
+				@player = AIPlayer::Player.new(gamestate[:players][:you], :self)
+				@others = gamestate[:players][:others].map{|o| AIPlayer::Player.new(o)}
+				choose_move!
+			end
 		end
 
 		def choose_move!
@@ -80,10 +88,14 @@ module AIPlayer
 		def other_player_locations
 			@client.other_player_locations
 		end
+
+		def base_prices
+			@client.base_prices
+		end
 	end
 
 	class Tile
-		attr_accessor :board, :x, :y, :zombies, :customers, :visible
+		attr_accessor :board, :x, :y, :zombies, :customers, :visible, :store
 
 		def initialize(hashdata, board, visible = true)
 			@board = board
@@ -92,7 +104,10 @@ module AIPlayer
 			@y = hashdata[:y]
 			@zombies = hashdata[:zombies]
 			@customers = hashdata[:customers].map{|c| Customer.new(c, self)}
-			@board.add_store(self) if hashdata[:store]
+			if hashdata[:store]
+				@board.add_store(self)
+				@store = true
+			end
 		end
 
 		def location
@@ -120,10 +135,13 @@ module AIPlayer
 			other_player_locations = @board.other_player_locations
 			visible_neighbors.reject{|n| other_player_locations.include? n.location }
 		end
+
+		def base_prices
+			@board.base_prices
+		end
 	end
 
 	class Customer
-		@@base_prices = { "v" => 2, "c" => 3, "s" => 3 }
 		attr_accessor :tile, :id, :favorite
 
 		def initialize(hashdata, tile)
@@ -135,24 +153,27 @@ module AIPlayer
 				:number => hashdata[:favorite_number],
 			}
 		end
+
+		def base_prices
+			@tile.base_prices
+		end
 	end
 
 	class Player
-		attr_accessor :who, :location, :score, :money, :inventory, :kills, :sales, :turns_remaining, :can_act, :can_move
+		attr_accessor :who, :location, :prev_location, :score, :money, :inventory, :kills, :sales, :turns_remaining, :can_act, :can_move
 
 		def initialize(hashdata, who = :other)
 			@who = who
 			@location = {:x => hashdata[:x], :y => hashdata[:y]}
+			@prev_location = {:x => hashdata[:prev_x], :y => hashdata[:prev_y]}
 			@score = hashdata[:score]
 			@money = hashdata[:money]
-			if who == :self
-				@inventory = {
-					:v => hashdata[:vanilla],
+			@inventory = if (who == :self)
+				{	:v => hashdata[:vanilla],
 					:c => hashdata[:chocolate],
-					:s => hashdata[:strawberry]
-				}
+					:s => hashdata[:strawberry] }
 			else
-				@inventory = nil
+				nil
 			end
 			@kills = hashdata[:kills]
 			@sales = hashdata[:sales]
