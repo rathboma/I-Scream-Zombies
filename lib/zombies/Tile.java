@@ -2,8 +2,6 @@ package zombies;
 
 import game.*;
 import java.awt.*;
-import java.util.*;
-
 
 public class Tile{
 	
