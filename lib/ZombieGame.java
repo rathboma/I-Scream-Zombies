@@ -26,8 +26,8 @@ public class ZombieGame extends Platform {
       }
     }
 		
-		Player player = Config.player = new Player();
-		player.setPosition(13, 13);
+		//Player player = Config.player = new Player();
+		//player.setPosition(13, 13);
 		//Tile tile = tiles[13][13];
 		tiles[13][13].discover();
 		setFocus(13, 13); //sets the camera focus on the central tile.

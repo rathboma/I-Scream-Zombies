@@ -22,17 +22,15 @@ public class Randomizer{
 		return results;
 	}
 	
+	/*
 	public static Zombie[] getZombies(Customer[] customers){
 		int number = (Math.abs(math.nextInt()) % maxP) + 1;
 		Zombie[] results = new Zombie[number];
 		for(int i = 0; i < number; i++){
 			results[i] = new Zombie();
 		}
-		
-		
 		return results;
 	}
-	
-	
+	*/
 	
 }

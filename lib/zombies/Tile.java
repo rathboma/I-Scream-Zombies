@@ -14,7 +14,7 @@ public class Tile{
 	int bigTot = bigSize + bigGap;
 	
 	public int card;
-	public Zombie[] zombies = null;
+	//public Zombie[] zombies = null;
 	public Customer[] customers = null;
 	ModifierBase modifier = null;
 	
@@ -40,7 +40,7 @@ public class Tile{
 		modifier = Randomizer.getModifier();
 		if(modifier == null){
 			customers = Randomizer.getCustomers(); //totally random
-			zombies = Randomizer.getZombies(customers); //may be based on the number of people
+			//zombies = Randomizer.getZombies(customers); //may be based on the number of people
 		}
 		
 			
