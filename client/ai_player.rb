@@ -34,14 +34,18 @@ module AIPlayer
 			#end
 		end
 
-		def take_action(tilestate)
-			#if the tile sucks and the previous tile is better\
+		def take_action!(tilestate)
+			#if the tile sucks and the previous tile is better
 			# => run away
 			#elsif there is a player adjacent
 			#	if there are more zombies than can be killed at once
 			#		kill zombies
 			#	elsif there are fewer zombies than can be killed at once
 			#		only kill zombies if the payoff from killing them is greater than the loss of letting the other player take the customers
+			#else
+			# => kill if there are zombies present
+			# => else sell to as many customers as possible, nonsinks first
+			#end
 		end
 
 		def player_location
