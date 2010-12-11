@@ -80,14 +80,14 @@ Actions
 
 
 	post Buy
-		params: flavor, number
+		params: uuid, flavor, number
 		returns tile, player
 	post sell
-		params: flavors, number, customer_id
+		params: uuid, flavors, number, customer_id
 		returns tile, player
 	post kill
-		params: none
+		params: uuid
 		returns tile, player
 	post run
-		params: none
+		params: uuid
 		returns tile, player

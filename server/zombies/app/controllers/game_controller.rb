@@ -46,14 +46,37 @@ class GameController < ApplicationController
       end
   end
   
-  
-  def post_perform_action
+  #params = uuid, type, details
+
+  def kill
     
-    
-    #interacts with the players current tile based on the type of action performed
     
   end
-  
-  
-  
+
+  def sell
+    
+  end
+
+  def buy
+    flavor = params[:flavors]
+    num = params[:number]
+    uuid = params[:uuid]
+    if !uuid
+      respond_with {:error => "you didn't supply a UUID"}
+    elsif !flavor || !num
+      respond_with {:error => "didn't supply either the flavor, or the number to buy"}
+    else
+      @player = Player.find_by_uuid(uuid)
+      if !@player
+        respond_with {:error => "player not found!"}
+      else
+        response = @player.game.buy(@player, flavor, num)
+        respond_with response.nil? ? {:error => @player.game.error} : response
+      end
+    end
+  end
+
+  def run
+    
+  end
 end
