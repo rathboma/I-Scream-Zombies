@@ -12,5 +12,15 @@ class Customer < ActiveRecord::Base
     c
   end
   
+  def to_hash
+    return {
+      :id => id,
+      :favorite_type => favorite_type,
+      :favorite_price => favorite_price,
+      :favorite_number => favorite_number
+    }
+    
+  end
+  
   
 end

@@ -5,10 +5,10 @@ class CreateTiles < ActiveRecord::Migration
       t.column :x, :int
       t.column :y, :int
       t.column :store, :boolean
-      t.column :game_id, :int
+      t.column :game_board_id, :int
       t.timestamps
     end
-    add_index :tiles, [:x, :y, :game_id]
+    add_index :tiles, [:x, :y, :game_board_id]
   end
 
   def self.down

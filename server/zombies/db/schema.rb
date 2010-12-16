@@ -10,40 +10,80 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101211175148) do
+ActiveRecord::Schema.define(:version => 20101211190947) do
 
-  create_table "game_boards", :force => true do |t|
+  create_table "customers", :force => true do |t|
+    t.string   "favorite_type"
+    t.float    "favorite_price"
+    t.integer  "favorite_number"
+    t.integer  "tile_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
+  add_index "customers", ["tile_id"], :name => "index_customers_on_tile_id"
+
+  create_table "game_boards", :force => true do |t|
+    t.integer  "x"
+    t.integer  "y"
+    t.integer  "game_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "game_boards", ["game_id"], :name => "index_game_boards_on_game_id"
+
   create_table "games", :force => true do |t|
+    t.integer  "player1_id"
+    t.integer  "player2_id"
+    t.integer  "game_board_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "json_games", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "players", :force => true do |t|
     t.string   "uuid"
-    t.integer  "x"
-    t.integer  "y"
-    t.float    "money"
-    t.integer  "vanilla"
-    t.integer  "chocolate"
-    t.integer  "strawberry"
-    t.integer  "kills"
-    t.integer  "sales"
+    t.integer  "x",               :default => 0
+    t.integer  "y",               :default => 0
+    t.integer  "prev_x"
+    t.integer  "prev_y"
+    t.float    "money",           :default => 0.0
+    t.integer  "vanilla",         :default => 0
+    t.integer  "chocolate",       :default => 0
+    t.integer  "strawberry",      :default => 0
+    t.integer  "kills",           :default => 0
+    t.integer  "sales",           :default => 0
     t.integer  "turns_remaining"
+    t.boolean  "turn"
     t.boolean  "can_act"
     t.boolean  "can_move"
+    t.integer  "game_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "players", ["uuid"], :name => "index_players_on_uuid"
 
-  create_table "tiles", :force => true do |t|
+  create_table "somethings", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "tiles", :force => true do |t|
+    t.integer  "zombies"
+    t.integer  "x"
+    t.integer  "y"
+    t.boolean  "store"
+    t.integer  "game_board_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "tiles", ["x", "y", "game_board_id"], :name => "index_tiles_on_x_and_y_and_game_board_id"
 
 end

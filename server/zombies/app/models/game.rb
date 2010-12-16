@@ -1,29 +1,58 @@
 class Game < ActiveRecord::Base
   scope :waiting, :conditions => ["player1_id IS NULL OR player2_id IS NULL"]
-  
-  has_one :game_board, :foreign_key => :game_board_id
+  has_one :game_board
+  attr_accessible :player1_id, :player2_id
   
   COSTS = { "V" => 1, "C" => 2, "S" => 3 }
   PRICES = { "V" => 1.5, "C" => 4, "S" => 4.5 }
   
+  
+  def self.new_with_game_board
+    g = new
+    g.game_board = GameBoard.new(:x => 75, :y => 75)
+    g
+  end
+
   def move_error
     return @error
   end
   
-  def add_player(p)
+  def add_player!(p)
     if !player1_id
-      player1_id = p.id
+      puts "adding player: #{p.inspect}"
+      self.player1_id = p.id
     else
-      player2_id = p.id
+      self.player2_id = p.id
     end
+    self.save!
+  end
+  
+  def turns_remaining
+    return player1.turns_remaining + player2.turns_remaining if player1 && player2
+    return nil
   end
   
   
   def player1
-    Player.find_by_uuid(self.player1_id)
+    @player1 ||= Player.find(self.player1_id) if player1_id
   end
   def player2
-    Player.find_by_uuid(self.player2_id)
+    @player2 ||= Player.find(self.player2_id) if player2_id
+  end
+  def other_player(p)
+    return player2 if p == player1
+    return player1
+  end
+  
+  def game_over?
+    return turns_remaining != nil && self.turns_remaining <= 0
+  end
+  
+  def won?(p)
+    other = other_player(p)
+    return false if p.nil? || other.nil?
+    return false if self.turns_remaining > 0
+    return p.get_score > other.get_score
   end
   
   def move(player, x, y)
@@ -49,6 +78,15 @@ class Game < ActiveRecord::Base
     # return tile
     
   end
+  
+  def ready?
+    return player1_id && player2_id
+  end
+  
+  def start_game
+    player1.update_attributes(:can_move => true)
+  end
+  
   
   def buy(player, flavor, num)
     

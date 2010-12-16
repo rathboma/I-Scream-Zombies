@@ -1,15 +1,15 @@
 Zombies::Application.routes.draw do
-  resources :somethings
-
-  get "test/new"
-
-  get "test/hello"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
   
   match 'join' => 'game#join', :via => :post
-  
+  match 'kill' => 'game#kill', :via => :post
+  match 'sell' => 'game#sell', :via => :post
+  match 'buy' => 'game#buy', :via => :post
+  match 'move' => 'game#post_make_move', :via => :post
+  match 'get_game_state/:uuid' => 'game#get_game_state', :via => :get
+  match 'show/:uuid' => 'game#show', :via => :get
   
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'
