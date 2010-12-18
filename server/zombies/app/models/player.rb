@@ -28,6 +28,7 @@ class Player < ActiveRecord::Base
       :money => money,
       :chocolate => chocolate,
       :strawberry => strawberry,
+      :vanilla => vanilla,
       :kills => kills,
       :sales => sales,
       :turns_remaining => turns_remaining,
@@ -37,12 +38,42 @@ class Player < ActiveRecord::Base
       :prev_x => prev_x,
       :turn => turn?,
       :prev_y => prev_y
-    }
+    }    
+  end
+  
+  def to_hash
+    return as_hash
+  end
+  
+  def [](flavor)
+    case flavor.to_s.upcase
+      when 'V' then self.vanilla
+      when 'S' then self.strawberry
+      when 'C' then self.chocolate
+      else nil
+    end
+  end
+  
+  def []=(flavor, value)
+    case flavor.upcase
+    when 'V' then self.vanilla = value
+    when 'S' then self.strawberry = value
+    when 'C' then self.chocolate = value
+    end
+  end
+  
+  def decrement(flavor, number)
+    if self[flavor] #base flavor
+      self[flavor] -= number
+      
+    end
     
   end
   
+  
+  
   def turn?
-    return can_move || can_act
+    return can_move || can_act ? true : false
   end
   
   def update_position(new_x, new_y)

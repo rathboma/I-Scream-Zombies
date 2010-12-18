@@ -88,17 +88,81 @@ class Game < ActiveRecord::Base
   end
   
   
-  def buy(player, flavor, num)
+  def action_result(player, tile)
+    return {
+      :player => player.to_hash,
+      :tile => tile.to_hash
+    }
     
+  end
+  
+  
+  def buy(player, flavor, num)
+    num = num.abs
+    
+    if !PRICES[flavor]
+      error = 'not a valid ice-cream'
+      return nil
+    end
+    @tile = game_board.tiles.with_coordinates(player.x, player.y) 
+    
+    unless @tile.store?
+      error = 'you are not on a store'
+      return nil
+    end
     # validate the player is on a store
     # validate the player has enough money
+    amount = PRICES[flavor]*num
     
-    if player.money >= PRICES[flavor]*num
-      #ok
-    else
-      #not ok
+    if amount > player.money
+      error = 'not enough money'
+      return nil
     end
     
+    player[flavor] = player[flavor] + num
+    player.money -= amount
+    finish_action(player)
+    player.save!
+    return action_result(player, @tile)
+    #ok
+  end
+  
+  def sell(player, flavor, number, customer_id)
+    @player = player
+    tile = @player.game.game_board.tiles.with_coordinates(@player.x, @player.y).first()
+    @customer = tile.customers.find(customer_id)
+    
+    if !@customer
+      render :json => {:error => "could not find customer"}
+      return
+    end
+    
+    flavors = PRICES.keys + [@customer.favorite_type]
+    prices = PRICES.merge {@customer.favorite_type => @customer.favorite_price}
+    
+    
+    if !flavors.include(flavor)
+      error = "invalid ice cream combo specified, only valid: #{base_flavors.inspect}"
+      return nil
+    end
+    
+    to_sell = flavor.split(/,\s*/)
+    
+    if (!@customer.can_consume?(flavor, number) 
+      error = "you can't sell that many ice creams"
+      return nil
+    end
+    
+    to_sell.each do #stuff
+    
+    @player.money += prices[flavor]*num
+    @customer.destroy!
+    finish_action(@player)
+  end
+  
+  def finish_action(player)
+    @player.update_attributes(:can_act => false, :turns_remaining => @player.turns_remaining - 1)
+    @player.game.other_player(@player).update_attributes(:can_move => true)
   end
   
 

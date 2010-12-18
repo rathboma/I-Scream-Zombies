@@ -84,49 +84,31 @@ class GameController < ApplicationController
 
   def sell
     return if !validate_action!()
+    
     flavors = params[:flavors]
     number = Math.abs(params[:number].to_i)
     customer_id = params[:customer_id].to_i
-    tile = @player.game.game_board.tiles.with_coordinates(@player.x, @player.y).first()
-    @customer = tile.customers.find(customer_id)
-    
-    if !@customer
-      render :json => {:error => "could not find customer"}
-      return
-    end
-    flavors = ['V', 'S', 'C', @customer.favorite_type]
-    if !base_flavors.include?(flavors)
-      render :json => {:error => "invalid ice cream combo specified, only valid: #{base_flavors.inspect}"}
-      return
-    end
-    if (flavors = @customer.favorite_type && number > @cutomer.favorite_number && @customer.favorite_number != -1) ||
-        number != 1
-      render :json => {:error => "you can't buy that many ice creams"}
-      return
-    end
-    @customer.destroy!
-    @player.update_attributes(:can_act => false, :turns_remaining => @player.turns_remaining - 1)
-    @player.game.other_player(@player).update_attributes(:can_move => true)
+    response = @player.game.buy(@player, flavor, num)
+    render :json => response.nil? ? {:error => @player.game.error} : response
   end
 
   def buy
+    return unless validate_action!() && validate_buy_sell!()
     flavor = params[:flavors]
     num = params[:number]
     uuid = params[:uuid]
-    if !uuid
-      respond_with({:error => "you didn't supply a UUID"})
-    elsif !flavor || !num
+
+    if !flavor || !num
       respond_with({:error => "didn't supply either the flavor, or the number to buy"})
-    else
-      @player = Player.find_by_uuid(uuid)
-      if !@player
-        respond_with ({:error => "player not found!"})
-      else
-        response = @player.game.buy(@player, flavor, num)
-        respond_with response.nil? ? {:error => @player.game.error} : response
-      end
+      return
     end
+    
+    response = @player.game.buy(@player, flavor, num)
+    respond_with response.nil? ? {:error => @player.game.error} : response
+
+
   end
+  
 
   def run
     

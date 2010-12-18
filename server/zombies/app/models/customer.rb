@@ -22,5 +22,14 @@ class Customer < ActiveRecord::Base
     
   end
   
+  def can_consume?(flavor, number)
+    if flavor == favorite_type
+      return true if favorite_number == -1 || favorite_number >= number
+    else
+      return true if number == 1
+    end
+    return false
+  end
+  
   
 end
