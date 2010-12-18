@@ -26,7 +26,7 @@ class Customer < ActiveRecord::Base
     if flavor == favorite_type
       return true if favorite_number == -1 || favorite_number >= number
     else
-      return true if number == 1
+      return true if number == 1 && Game::PRICES.keys.include?(flavor)
     end
     return false
   end

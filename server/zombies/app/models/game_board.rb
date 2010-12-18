@@ -28,7 +28,7 @@ class GameBoard < ActiveRecord::Base
   def tile_list
     results = []
     self.tiles.each {|t| results << t.to_hash}
-    results
+
   end
   
 end
