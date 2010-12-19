@@ -175,26 +175,4 @@ public class GameController {
     Player player = new Player.PlayerBuilder(x, y).buildPlayer();
     gameModel.updatePlayer(player);
   }
-  
-  public static void main(String[] args) {
-    String serverAddress = "http://iscreamzombies.heroku.com/get_game_state/NCQNWTPPJVBTLJSS";
-    try {
-      URL serverURL = new URL(serverAddress);
-      HttpURLConnection connection = 
-          (HttpURLConnection) serverURL.openConnection();
-      connection.connect();
-      //OutputStream os = connection.getOutputStream();
-      BufferedReader is = new BufferedReader(
-          new InputStreamReader(connection.getInputStream()));
-      //os.write();
-      
-      String inputLine;
-      while ((inputLine = is.readLine()) != null) {
-        System.out.println(inputLine);
-      }
-      
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
 }
