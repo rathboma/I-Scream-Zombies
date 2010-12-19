@@ -1,20 +1,32 @@
 package zombies.controller;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.*;
+import java.net.*;
 
-import zombies.model.GameBoard;
-import zombies.model.GameModel;
-import zombies.model.Player;
-import zombies.model.Tile;
+import org.json.*;
+
+import zombies.model.*;
 
 /**
  * "Controller" object for the I Scream Zombies Game
  * @author Dan L. Dela Rosa
  */
 public class GameController {
+  private HttpURLConnection connection;
+  static final String serverAddress = "http://iscreamzombies.heroku.com/";
+  private URL serverURL;
+  
   // Make sure the object cannot instantiated externally
-  private GameController() {}
+  private GameController() {
+    try {
+      serverURL = new URL(serverAddress);
+      connection = (HttpURLConnection) serverURL.openConnection();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
   // This class is a Singleton
   private static final GameController instance = new GameController();
   // Right now, the controller managers only one game at a time
@@ -28,6 +40,57 @@ public class GameController {
     return instance;
   }
   
+  /**
+   * 
+   */
+  private void setPostMode() {
+    try {
+      connection.setRequestMethod("POST");
+    } catch (ProtocolException e) {
+      e.printStackTrace();
+    }
+  }
+  
+  /**
+   * 
+   */
+  private void setGetMode() {
+    try {
+      connection.setRequestMethod("GET");
+    } catch (ProtocolException e) {
+      e.printStackTrace();
+    }
+  }
+  
+  /**
+   * @param object
+   */
+  private JSONObject sendJSONObject(JSONObject object) {
+    String response = "";
+    try {
+      OutputStream os = connection.getOutputStream();
+      BufferedReader is = new BufferedReader(
+          new InputStreamReader(connection.getInputStream()));
+      os.write(object.toString().getBytes());
+      
+      String inputLine;
+      while ((inputLine = is.readLine()) != null) {
+        System.out.println(inputLine);
+        response = response.concat(inputLine);
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    
+    try {
+      return new JSONObject(response);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return new JSONObject();
+  }
+  
   public synchronized void joinGame(String name) {
     JSONObject object = new JSONObject();
     try {
@@ -35,11 +98,18 @@ public class GameController {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    // TODO send request
-    // TODO get response
+    setPostMode();
+    JSONObject response = sendJSONObject(object);
+    try {
+      String uuid = response.getString("uuid");
+      gameModel.setUUID(uuid);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
   }
-  
+
   public synchronized void getTurn() {
+    setGetMode();
     // TODO send request
     // TODO get response
     gameModel.updateYourTurn(false);
@@ -104,5 +174,27 @@ public class GameController {
     gameModel.updateTile(x, y, tile);
     Player player = new Player.PlayerBuilder(x, y).buildPlayer();
     gameModel.updatePlayer(player);
+  }
+  
+  public static void main(String[] args) {
+    String serverAddress = "http://iscreamzombies.heroku.com/get_game_state/NCQNWTPPJVBTLJSS";
+    try {
+      URL serverURL = new URL(serverAddress);
+      HttpURLConnection connection = 
+          (HttpURLConnection) serverURL.openConnection();
+      connection.connect();
+      //OutputStream os = connection.getOutputStream();
+      BufferedReader is = new BufferedReader(
+          new InputStreamReader(connection.getInputStream()));
+      //os.write();
+      
+      String inputLine;
+      while ((inputLine = is.readLine()) != null) {
+        System.out.println(inputLine);
+      }
+      
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }
