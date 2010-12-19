@@ -25,10 +25,17 @@ class GameBoard < ActiveRecord::Base
     }
   end
   
+  def to_hash
+    return {
+      :size => [self.x, self.y],
+      :known => self.tile_list
+    }
+  end
+  
   def tile_list
     results = []
     self.tiles.each {|t| results << t.to_hash}
-
+    return results
   end
   
 end

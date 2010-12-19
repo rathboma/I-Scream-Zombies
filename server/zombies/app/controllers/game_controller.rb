@@ -51,11 +51,16 @@ class GameController < ApplicationController
   def post_make_move
     #moves to a new tile : if tile doesn't exist, create the tile and add it to the game_state
     @player = Player.find_by_uuid(params[:uuid])
+    if !@player
+      render :json => {:error => "not a valid player UUID"}
+      return
+    end
+    
     @game = @player.game
       if @tile = @game.move(@player, params[:x], params[:y])
-        respond_with( {:tile => @tile, :player => @player})
+         render :json => {:tile => @tile.to_hash, :player => @player.to_hash}
       else
-        respond_with ({:error => @game.move_error})
+        render :json => {:error => @game.move_error}
       end
   end
   
