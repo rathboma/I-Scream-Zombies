@@ -3,7 +3,14 @@ class Player < ActiveRecord::Base
   attr_accessible :uuid, :x, :y, :money, :vanilla, :chocolate, :strawberry, :kills, :sales, :turns_remaining, :can_act, :can_move, :prev_x, :prev_y
   
   before_save :set_uuid
-  belongs_to :game, :foreign_key => :game_id
+  
+#  belongs_to :game, :foreign_key => :game_id
+  
+  def game
+    @game ||= Game.find(game_id)
+    @game
+  end
+  
   
   def set_uuid
     self.uuid ||= random_string()
