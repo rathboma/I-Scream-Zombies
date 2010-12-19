@@ -1,9 +1,14 @@
-package zombies;
+package zombies.view;
 
 import game.*;
 import java.awt.*;
 
-public class Tile{
+/**
+ * "Zoomed in" view of a tile
+ * TODO extends RectThing
+ * @author Dan L. Dela Rosa
+ */
+public class TileView{
 	
 	int bigSize = 75;
 	int smallSize = 5;
@@ -15,15 +20,17 @@ public class Tile{
 	
 	public int card;
 	//public Zombie[] zombies = null;
-	public Customer[] customers = null;
-	ModifierBase modifier = null;
+	//public Customer[] customers = null;
+	//ModifierBase modifier = null;
 	
 	
 	public RectThing bigTile;
+	// TODO smallTile should be MiniTileViewInstead
 	public RectThing smallTile;
 	
-	public Tile(int xPos, int yPos){
+	public TileView(int xPos, int yPos){
 		
+	  /*
 		Coordinate miniStart = Config.minimap.topLeft();
 		
 		bigTile = new RectThing((xPos*bigTot), yPos*bigTot, bigSize, bigSize);
@@ -33,15 +40,16 @@ public class Tile{
 		smallTile = new RectThing((xPos*smallTot) + miniStart.x, miniStart.y + (yPos*smallTot), smallSize, smallSize);
 		smallTile.makeStatic();
 		Config.platform.addThing(smallTile);
-		
+		*/
 
 		
-		
+		/*
 		modifier = Randomizer.getModifier();
 		if(modifier == null){
 			customers = Randomizer.getCustomers(); //totally random
 			//zombies = Randomizer.getZombies(customers); //may be based on the number of people
 		}
+		*/
 		
 			
 	}
