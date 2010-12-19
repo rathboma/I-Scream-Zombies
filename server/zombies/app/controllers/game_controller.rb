@@ -32,8 +32,6 @@ class GameController < ApplicationController
     @player = Player.find_by_uuid(params[:id])
     render :json => {:turn => @player.turn}
   end
-  
-  
   #sends player.uuid
   def get_game_state
     @player = Player.find_by_uuid(params[:uuid])
@@ -71,51 +69,54 @@ class GameController < ApplicationController
     uuid = params[:uuid]
     if !uuid || !(@player = Player.find_by_uuid(uuid))
       render :json => {:error => "you didn't supply a valid UUID"}
+      puts "invalid"
       return false
     end
     if !@player.can_act
       render :json => {:error => "this player is not allowed to act"}
+      puts "also invalid"
       return false
     end
+    return true
   end
 
   def kill
-    return if !validate_action!()
-    tile = @player.game.game_board.tiles.with_coordinates(@player.x, @player.y).first()
-    tile.update_attributes(:zombies => tile.zombies - 1) if tile.zombies > 0
-    @player.update_attributes(:can_act => false, :turns_remaining => @player.turns_remaining - 1)
-    @player.game.other_player(@player).update_attributes(:can_move => true)
+    return unless validate_action!()
+    puts "validated"
+    response = @player.game.kill(@player)
+    render :json => response.nil? ? {:error => @player.game.error} : response
   end
 
   def sell
-    return if !validate_action!()
-    
+    return unless !validate_action!()
+    puts "here!"
     flavors = params[:flavors]
-    number = Math.abs(params[:number].to_i)
+    number = params[:number].to_i.abs
     customer_id = params[:customer_id].to_i
-    response = @player.game.buy(@player, flavor, num)
+    response = @player.game.sell(@player, flavors, number, customer_id)
+    puts response
     render :json => response.nil? ? {:error => @player.game.error} : response
   end
 
   def buy
-    return unless validate_action!() && validate_buy_sell!()
-    flavor = params[:flavors]
-    num = params[:number]
+    return unless validate_action!()
+    flavor = params[:flavor]
+    num = params[:number].to_i.abs
     uuid = params[:uuid]
 
     if !flavor || !num
-      respond_with({:error => "didn't supply either the flavor, or the number to buy"})
+      render :json => {:error => "didn't supply either the flavor, or the number to buy"}
       return
     end
     
     response = @player.game.buy(@player, flavor, num)
-    respond_with response.nil? ? {:error => @player.game.error} : response
-
-
+    render :json => response.nil? ? {:error => @player.game.error} : response
   end
   
 
   def run
     
   end
+  
+  
 end

@@ -1,6 +1,6 @@
 class Tile < ActiveRecord::Base
-  attr_accessible :x, :y, :store, :zombies
-  
+  attr_accessible :x, :y, :store, :zombies, :game_board_id
+  belongs_to :game_board
   has_many :customers
   
   scope :with_coordinates, lambda {|x, y| where(:x => x, :y => y)}
