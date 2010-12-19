@@ -1,7 +1,7 @@
 package zombies.model;
 
 /**
- * "Model" object for the I Scream Zombies Game
+ * Game board for the I Scream Zombies Game
  * @author Dan L. Dela Rosa
  */
 public class GameBoard {
@@ -244,9 +244,8 @@ public class GameBoard {
    * Overwrite the client's player data
    * @param player The player data
    */
-  public void updatePlayer(Player player) {
+  void updatePlayer(Player player) {
     you = player;
-    // TODO update view
   }
   
   /**
@@ -255,35 +254,31 @@ public class GameBoard {
    * @param y
    * @param tile
    */
-  public void updateTile(int x, int y, Tile tile) {
+  void updateTile(int x, int y, Tile tile) {
     tiles[x][y] = tile;
-    // TODO update view
   }
   
   /**
    * Update whether it is your turn
    * @param yourTurn
    */
-  public void updateYourTurn(boolean yourTurn) {
+  void updateYourTurn(boolean yourTurn) {
     this.yourTurn = yourTurn;
-    // TODO update view
   }
   
   /**
    * Update whether the game is over
    * @param gameOver
    */
-  public void updateGameOver(boolean gameOver) {
+  void updateGameOver(boolean gameOver) {
     this.gameOver = gameOver;
-    // TODO update view
   }
   
   /**
    * Update whether you win
    * @param win
    */
-  public void updateWin(boolean win) {
+  void updateWin(boolean win) {
     this.win = win;
-    // TODO update view
   }
 }
