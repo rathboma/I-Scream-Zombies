@@ -26,6 +26,8 @@ public class GameModel extends Observable {
   
   public void setGameBoard(GameBoard board) {
     this.board = board;
+    System.out.println("updated");
+    notifyObservers(board);
   }
   
   public GameBoard getGameBoard() {

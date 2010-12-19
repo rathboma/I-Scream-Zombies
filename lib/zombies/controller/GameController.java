@@ -6,26 +6,17 @@ import java.net.*;
 import org.json.*;
 
 import zombies.model.*;
+import zombies.model.GameBoard.GameBoardBuilder;
 
 /**
  * "Controller" object for the I Scream Zombies Game
  * @author Dan L. Dela Rosa
  */
 public class GameController {
-  private HttpURLConnection connection;
   static final String serverAddress = "http://iscreamzombies.heroku.com/";
-  private URL serverURL;
   
   // Make sure the object cannot instantiated externally
   private GameController() {
-    try {
-      serverURL = new URL(serverAddress);
-      connection = (HttpURLConnection) serverURL.openConnection();
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
   // This class is a Singleton
   private static final GameController instance = new GameController();
@@ -41,86 +32,73 @@ public class GameController {
   }
   
   /**
-   * 
+   * @param requestAddress
    */
-  private void setPostMode() {
-    try {
-      connection.setRequestMethod("POST");
-    } catch (ProtocolException e) {
-      e.printStackTrace();
-    }
-  }
-  
-  /**
-   * 
-   */
-  private void setGetMode() {
-    try {
-      connection.setRequestMethod("GET");
-    } catch (ProtocolException e) {
-      e.printStackTrace();
-    }
-  }
-  
-  /**
-   * @param object
-   */
-  private JSONObject sendJSONObject(JSONObject object) {
+  private JSONObject sendGetRequestToServer(String requestAddress) {
     String response = "";
     try {
-      OutputStream os = connection.getOutputStream();
+      URL serverURL = new URL(requestAddress);
+      HttpURLConnection connection = 
+          (HttpURLConnection) serverURL.openConnection();
+      connection.connect();
       BufferedReader is = new BufferedReader(
           new InputStreamReader(connection.getInputStream()));
-      os.write(object.toString().getBytes());
-      
       String inputLine;
       while ((inputLine = is.readLine()) != null) {
-        System.out.println(inputLine);
-        response = response.concat(inputLine);
+        response = response + inputLine;
       }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    
-    try {
       return new JSONObject(response);
-    } catch (JSONException e) {
+    }
+    catch (Exception e) {
       e.printStackTrace();
     }
     return new JSONObject();
   }
-  
+    
   public synchronized void joinGame(String name) {
-    JSONObject object = new JSONObject();
-    try {
-      object.put("name", name);
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    setPostMode();
-    JSONObject response = sendJSONObject(object);
-    try {
-      String uuid = response.getString("uuid");
-      gameModel.setUUID(uuid);
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
   }
 
   public synchronized void getTurn() {
-    setGetMode();
     // TODO send request
     // TODO get response
     gameModel.updateYourTurn(false);
   }
   
-  public synchronized void getGameState() {
-    // TODO send request
-    // TODO get response
-    GameBoard gameBoard = 
-        new GameBoard.GameBoardBuilder("", 0, 0).buildGameBoard();
-    gameModel.setGameBoard(gameBoard);
+  public synchronized void getGameState(String UUID) {
+    String requestAddress = serverAddress + "get_game_state/" + UUID;
+    JSONObject response = sendGetRequestToServer(requestAddress);
+    
+    try {
+      JSONObject gameBoardData = (JSONObject)response.get("game_board");
+      
+      JSONArray sizeData = (JSONArray)gameBoardData.get("size");
+      int width = sizeData.getInt(0);
+      int height = sizeData.getInt(1);
+      GameBoardBuilder gameBoardBuilder = 
+        new GameBoardBuilder(UUID, width, height);
+      
+      JSONArray knownTileData = (JSONArray)gameBoardData.get("known");
+      int knownTileIndex = 0;
+      while(!knownTileData.isNull(knownTileIndex)) {
+        JSONObject tileData = (JSONObject)knownTileData.get(knownTileIndex);
+        System.out.println(tileData);
+        knownTileIndex++;
+      }
+      
+      JSONObject playerData = (JSONObject)response.get("players");
+      
+      JSONObject yourPlayerData = (JSONObject)playerData.get("you");
+      System.out.print(yourPlayerData);
+      
+      JSONArray otherPlayerData = (JSONArray)playerData.get("others");
+      System.out.print(otherPlayerData);
+      
+      GameBoard gameBoard = gameBoardBuilder.buildGameBoard();
+      gameModel.setGameBoard(gameBoard);
+    }
+    catch (JSONException e) {
+      e.printStackTrace();
+    }
   }
   
   public synchronized void makeMove(int x, int y) {
