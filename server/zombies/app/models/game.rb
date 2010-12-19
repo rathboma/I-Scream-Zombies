@@ -16,6 +16,9 @@ class Game < ActiveRecord::Base
   def move_error
     return @error
   end
+  def error
+    return @error
+  end
   
   def add_player!(p)
     if !player1_id
@@ -94,8 +97,7 @@ class Game < ActiveRecord::Base
   
   def start_game
     player1.update_attributes(:can_move => true)
-  end
-  
+  end  
   
   def action_result(player, tile)
     return {
@@ -106,25 +108,39 @@ class Game < ActiveRecord::Base
   end
   
   
+  def kill(player)
+    @player = player
+    tile = @player.game.game_board.tiles.with_coordinates(@player.x, @player.y).first()
+    unless tile
+      @error = "tile not found"
+      return nil
+    end
+    tile.update_attributes(:zombies => tile.zombies - 1) if tile.zombies > 0
+    @player.update_attributes(:can_act => false, :turns_remaining => @player.turns_remaining - 1, :kills => @player.kills + 1)
+    @player.game.other_player(@player).update_attributes(:can_move => true)
+    return action_result(@player, tile)
+  end
+  
+  
   def buy(player, flavor, num)
     num = num.abs
     
     if !PRICES[flavor]
-      error = 'not a valid ice-cream'
+      @error = 'not a valid ice-cream'
       return nil
     end
-    @tile = game_board.tiles.with_coordinates(player.x, player.y) 
+    @tile = game_board.tiles.with_coordinates(player.x, player.y).first()
     
     unless @tile.store?
-      error = 'you are not on a store'
+      @error = 'you are not on a store'
       return nil
     end
     # validate the player is on a store
     # validate the player has enough money
-    amount = PRICES[flavor]*num
+    amount = COSTS[flavor]*num
     
     if amount > player.money
-      error = 'not enough money'
+      @error = 'not enough money'
       return nil
     end
     
@@ -139,43 +155,52 @@ class Game < ActiveRecord::Base
   def sell(player, flavor, number, customer_id)
     @player = player
     tile = @player.game.game_board.tiles.with_coordinates(@player.x, @player.y).first()
-    @customer = tile.customers.find(customer_id)
-    
-    if !@customer
-      render :json => {:error => "could not find customer"}
-      return
+    begin
+      @customer = tile.customers.find(customer_id)
+    rescue ActiveRecord::RecordNotFount
+      @error = "Could not find customer"
+      return nil
     end
     
     flavors = PRICES.keys + [@customer.favorite_type]
     prices = PRICES.merge({@customer.favorite_type => @customer.favorite_price})
     
+    if tile.zombies > 0
+      @error = "you cannot sell to customers when there are zombies around!"
+      return nil
+    end
     
-    if !flavors.include(flavor)
-      error = "invalid ice cream combo specified, only valid: #{base_flavors.inspect}"
+    if !flavors.include?(flavor)
+      @error = "invalid ice cream combo specified, only valid: #{base_flavors.inspect}"
       return nil
     end
     
     to_sell = flavor.split(/,\s*/)
     
     if (!@customer.can_consume?(flavor, number))
-      error = "you can't sell that many ice creams"
+      @error = "you can't sell that many ice creams"
       return nil
     end
     
     to_sell.each do |flav|#stuff
-      @player[flav] -= 1
+      @player[flav] -= number
+      if @player[flav] < 0
+        @error = "you don't have that many ice-creams to sell"
+        return nil
+      end
     end
-    @player.money += prices[flavor]*num
-    @customer.destroy!
+    @player.money += prices[flavor]*number
+    @player.sales += 1
+    @customer.destroy
     finish_action(@player)
+    return action_result(@player, tile)
   end
   
   def finish_action(player)
-    @player.update_attributes(:can_act => false, :turns_remaining => @player.turns_remaining - 1)
-    @player.can_act = false
-    @player.turns_remaining -= 1
-    @player.save!
-    @player.game.other_player(@player).update_attributes(:can_move => true)
+    player.can_act = false
+    player.turns_remaining -= 1
+    player.save!
+    player.game.other_player(player).update_attributes(:can_move => true)
   end
   
 
