@@ -1,63 +1,25 @@
 package zombies.view;
 
+import java.awt.Color;
+
 import game.*;
-import java.awt.*;
 
 /**
  * "Zoomed in" view of a tile
  * TODO extends RectThing
  * @author Dan L. Dela Rosa
  */
-public class TileView{
+public class TileView extends RectThing {
+	static final int bigSize = 75;
+	static final int bigGap = 10;
+	static final int bigTot = bigSize + bigGap;
 	
-	int bigSize = 75;
-	int smallSize = 5;
-	int bigGap = 10;
-	int smallGap = 2;
-	
-	int smallTot = smallSize + smallGap;
-	int bigTot = bigSize + bigGap;
-	
-	public int card;
-	//public Zombie[] zombies = null;
-	//public Customer[] customers = null;
-	//ModifierBase modifier = null;
-	
-	
-	public RectThing bigTile;
-	// TODO smallTile should be MiniTileViewInstead
-	public RectThing smallTile;
-	
-	public TileView(int xPos, int yPos){
-		
-	  /*
-		Coordinate miniStart = Config.minimap.topLeft();
-		
-		bigTile = new RectThing((xPos*bigTot), yPos*bigTot, bigSize, bigSize);
-		bigTile.makeStatic();
-		Config.platform.addThing(bigTile);
-				
-		smallTile = new RectThing((xPos*smallTot) + miniStart.x, miniStart.y + (yPos*smallTot), smallSize, smallSize);
-		smallTile.makeStatic();
-		Config.platform.addThing(smallTile);
-		*/
-
-		
-		/*
-		modifier = Randomizer.getModifier();
-		if(modifier == null){
-			customers = Randomizer.getCustomers(); //totally random
-			//zombies = Randomizer.getZombies(customers); //may be based on the number of people
-		}
-		*/
-		
-			
+	public TileView(int xPos, int yPos, GameApplet gameApplet){
+	  super((xPos*bigTot), yPos*bigTot, bigSize, bigSize);
+	  makeStatic();
 	}
 	
 	public void discover(){
-		smallTile.setColor(Color.gray);
-		bigTile.setColor(Color.lightGray);
+		setColor(Color.lightGray);
 	}
-
-	
 }

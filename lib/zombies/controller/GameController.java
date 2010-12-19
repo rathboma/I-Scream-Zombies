@@ -1,5 +1,8 @@
 package zombies.controller;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import zombies.model.GameBoard;
 import zombies.model.GameModel;
 import zombies.model.Player;
@@ -26,6 +29,12 @@ public class GameController {
   }
   
   public synchronized void joinGame(String name) {
+    JSONObject object = new JSONObject();
+    try {
+      object.put("name", name);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
     // TODO send request
     // TODO get response
   }

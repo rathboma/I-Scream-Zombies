@@ -9,6 +9,7 @@ import java.util.Observable;
 public class GameModel extends Observable {
   private GameBoard board = 
     new GameBoard.GameBoardBuilder("", 0 ,0).buildGameBoard();
+  private String UUID;
   
   //Make sure the object cannot instantiated externally
   private GameModel() {}
@@ -25,6 +26,18 @@ public class GameModel extends Observable {
   
   public void setGameBoard(GameBoard board) {
     this.board = board;
+  }
+  
+  public GameBoard getGameBoard() {
+    return board;
+  }
+
+  public void setUUID(String uUID) {
+    UUID = uUID;
+  }
+
+  public String getUUID() {
+    return UUID;
   }
 
   public void updateYourTurn(boolean yourTurn) {
