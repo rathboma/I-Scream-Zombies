@@ -1,12 +1,13 @@
-require 'rubygems'
-require 'json'
-require 'net/http'
-
+# Usage: Create a new client object. Then call make_move with the gamestate. Then call take_action with the tilestate
 module AIPlayer
 	class Client
 		attr_accessor :board, :player, :others, :base_prices, :costs
-		def initialize()
-		end
+
+		def initialize(); end
+		def all_player_locations(include_self = true); include_self ? other_player_locations << player_location : other_player_locations end
+		def get_tile(location); @board.get_tile(location) end
+		def player_location; @player.location end
+		def other_player_locations; @others.map(&:location) end
 
 		def make_move(gamestate)
 			if !gamestate[:game_over] && gamestate[:your_turn]
@@ -35,64 +36,93 @@ module AIPlayer
 		end
 
 		def move_towards_store
-			# find closest store
-			# path towards the store
+			dist = nil
+			store = nil
+			@board.stores.each do |s|
+				d = s.distance_to(player_location)
+				if dist.nil? || d < dist
+					dist = d
+					store = s
+				end
+			end
+			n_dist = nil
+			choice = nil
+			player_location.neighbors.each do |n|
+				nd = n.distance_to(store)
+				if n_dist.nil? || nd < n_dist
+					n_dist = nd
+					choice = n
+				end
+			end
+			choice
 		end
 
 		def get_neighbors(group = :all)
 			if group == :unoccupied
-				# TODO
+				player_location.neighbors_with_no_other_players
 			elsif group == :occupied
-				# TODO
-			elsif group == :unexplored
-				# TODO
-			elsif group == :explored
-				# TODO
+				player_location.neighbors_with_other_players
 			elsif group == :all
-				# TODO
+				player_location.neighbors
 			end
-		end
-
-		def all_player_locations(include_self = true)
-			include_self ? @others.collect(&:location) << @player.location : @other.collect(&:location)
 		end
 
 		def make_dick_move(options)
 			move = nil
 			options.each do |o|
-				# TODO check of any of them are worth it
-				# if no, return nil
+			move = o if (o.zombies > 0 && o.customers.size == 0) || (o.zombies == 0 && o.customers.size > 0)
 			end
 			move
 		end
 
 		def move_towards_frontier
-			# collect set of all explored points
-			# collect unexplored neighbors of set
-			# select the closest unexplored neighbor as destination
-			# make move towards that point
+			dist = nil
+			tile = nil
+			@board.tiles.collect do |t|
+				t.not_visible_neighbors
+			end.flatten.compact.uniq.each do |n| # Likely breaks if there is no frontier, but that requires every tile to have been explored
+				d = tile.distance_to(player_location)
+				if dist.nil? || d < dist
+					dist = d
+					tile = n
+				end
+			end
+			n_dist = nil
+			choice = nil
+			player_location.get_neighbors.each do |n|
+				nd = n.distance_to(tile)
+				if n_dist.nil? || nd < n_dist
+					n_dist = nd
+					choice = n
+				end
+			end
+			choice
 		end
 
 		def take_action!(tilestate)
-			#if the tile sucks and the previous tile is better
-			# => run away
-			#elsif there is a player adjacent
-			#	if there are more zombies than can be killed at once
-			#		kill zombies
-			#	elsif there are fewer zombies than can be killed at once
-			#		only kill zombies if the payoff from killing them is greater than the loss of letting the other player take the customers
-			#else
-			# => kill if there are zombies present
-			# => else sell to as many customers as possible, nonsinks first
-			#end
+			prev = get_tile(@player.prev_location)
+			curr = Tile.new(tilestate, @board)
+			if curr.zombies > 0
+				kill_zombies
+			elsif curr.customers.size > 0
+				sell_ice_cream
+			elsif (prev.zombies + prev.customers.size) > 0 && (curr.zombies + curr.customers.size) == 0
+				run_away
+			else
+				do_nothing
+			end
 		end
 
-		def player_location
-			@player.location
+		def kill_zombies
+			# TODO
 		end
 
-		def other_player_locations
-			@others.map(&:location)
+		def sell_ice_cream
+			# TODO
+		end
+
+		def run_away
+			# TODO
 		end
 	end
 
@@ -106,35 +136,26 @@ module AIPlayer
 			@tiles = hashdata[:known].map{|t| Tile.new(t, self)}
 		end
 
-		def add_store(store)
-			@stores << store
-		end
 
 		def tiles_adjacent_to(tile)
 			x, y = tile.x, tile.y
-			adjacency = [[+1,0], [-1,0], [0,+1], [0,-1]]
-			adjacency.map do |(dx, dy)|
-				if x+dx > 0 && x+dx < @dimensions[:x] && y+dy > 0 && y+dy < @dimensions[:y]
-					@tiles.select{|t| t.x == x+dx && t.y == y+dy}.first || Tile.new({:x => x+dx, :y => y+dy}, @board, false)
-				end
-			end.compact
+			adjacencies = [[+1,0], [-1,0], [0,+1], [0,-1]]
+			adjacencies.map{|(dx, dy)| get_tile(:x => x + dx, :y => y + dy)}.compact
 		end
 
-		def visible_tiles_adjacent_to(tile)
-			tiles_adjacent_to(tile).select{|t| t.visible}
+		def get_tile(location)
+			if x+dx > 0 && x+dx < @dimensions[:x] && y+dy > 0 && y+dy < @dimensions[:y] # If in bounds
+				@tiles.select{|t| t.x == x+dx && t.y == y+dy}.first || Tile.new({:x => x+dx, :y => y+dy}, @board, false)
+			else
+				nil
+			end
 		end
 
-		def not_visible_tiles_adjacent_to(tile)
-			tiles_adjacent_to(tile).select{|t| !t.visible}
-		end
-
-		def other_player_locations
-			@client.other_player_locations
-		end
-
-		def base_prices
-			@client.base_prices
-		end
+		def add_store(store); @stores << store end
+		def visible_tiles_adjacent_to(tile); tiles_adjacent_to(tile).select{|t| t.visible} end
+		def not_visible_tiles_adjacent_to(tile); tiles_adjacent_to(tile).select{|t| !t.visible} end
+		def other_player_locations; @client.other_player_locations end
+		def base_prices; @client.base_prices end
 	end
 
 	class Tile
@@ -153,21 +174,11 @@ module AIPlayer
 			end
 		end
 
-		def location
-			{:x => @x, :y => @y}
-		end
-
-		def neighbors
-			@board.tiles_adjacent_to(self)
-		end
-
-		def visible_neighbors
-			@board.visible_tiles_adjacent_to(self)
-		end
-
-		def not_visible_neighbors
-			@board.not_visible_tiles_adjacent_to(self)
-		end
+		def location; {:x => @x, :y => @y} end
+		def neighbors; @board.tiles_adjacent_to(self) end
+		def visible_neighbors; @board.visible_tiles_adjacent_to(self) end
+		def not_visible_neighbors; @board.not_visible_tiles_adjacent_to(self) end
+		def base_prices; @board.base_prices end
 
 		def neighbors_with_other_players
 			other_player_locations = @board.other_player_locations
@@ -177,10 +188,6 @@ module AIPlayer
 		def neighbors_with_no_other_players
 			other_player_locations = @board.other_player_locations
 			visible_neighbors.reject{|n| other_player_locations.include? n.location }
-		end
-
-		def base_prices
-			@board.base_prices
 		end
 	end
 
@@ -197,9 +204,7 @@ module AIPlayer
 			}
 		end
 
-		def base_prices
-			@tile.base_prices
-		end
+		def base_prices; @tile.base_prices end
 	end
 
 	class Player
