@@ -24,14 +24,53 @@ module AIPlayer
 		end
 
 		def choose_move!
-			#if inventory is running low, head home
-			#elsif neighbors with opponents is nonempty
-			# => check if you can be a dick to any neighbors
-			#elsif any neighbor is unexplored
-			# => explore a random unexplored neighbor
-			#else
-			# => find the closest unexplored point move towards it
-			#end
+			if @player.inventory_low?
+				move_towards_store
+			else
+				unoccupied_neighbors = get_neighbors(:unoccupied)
+				occupied_neighbors = get_neighbors(:occupied)
+				move = make_dick_move(occupied_neighbors) unless occupied_neighbors.empty?
+				move ||= move_towards_frontier 
+			end
+		end
+
+		def move_towards_store
+			# find closest store
+			# path towards the store
+		end
+
+		def get_neighbors(group = :all)
+			if group == :unoccupied
+				# TODO
+			elsif group == :occupied
+				# TODO
+			elsif group == :unexplored
+				# TODO
+			elsif group == :explored
+				# TODO
+			elsif group == :all
+				# TODO
+			end
+		end
+
+		def all_player_locations(include_self = true)
+			include_self ? @others.collect(&:location) << @player.location : @other.collect(&:location)
+		end
+
+		def make_dick_move(options)
+			move = nil
+			options.each do |o|
+				# TODO check of any of them are worth it
+				# if no, return nil
+			end
+			move
+		end
+
+		def move_towards_frontier
+			# collect set of all explored points
+			# collect unexplored neighbors of set
+			# select the closest unexplored neighbor as destination
+			# make move towards that point
 		end
 
 		def take_action!(tilestate)
@@ -184,6 +223,11 @@ module AIPlayer
 			@turns_remaining = hashdata[:turns_remaining]
 			@can_act = hashdata[:can_act]
 			@can_move = hashdata[:can_move]
+		end
+
+		def inventory_low?
+			v, c, s = @inventory[:v], @inventory[:c], @inventory[:s]
+			[v,c,s].max < 4 || v+c+s < 10
 		end
 	end
 end
