@@ -38,7 +38,8 @@ public class GameApplet extends Platform implements Observer {
     model.addObserver(this);
     
     GameController controller = GameController.getInstance();
-    controller.joinGame("Player 1");
+    controller.getGameState("NCQNWTPPJVBTLJSS");
+    //controller.joinGame("Player 1");
   }
   
   public void update(){
@@ -48,9 +49,9 @@ public class GameApplet extends Platform implements Observer {
   }
 
   public void update(Observable arg0, Object arg1) {
+    System.out.println("updated");
     if (!(arg1 instanceof GameBoard)) {
       return;
     }
-    // TODO grab changes
   }
 }

@@ -1,20 +1,23 @@
 package zombies.controller;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.*;
+import java.net.*;
 
-import zombies.model.GameBoard;
-import zombies.model.GameModel;
-import zombies.model.Player;
-import zombies.model.Tile;
+import org.json.*;
+
+import zombies.model.*;
+import zombies.model.GameBoard.GameBoardBuilder;
 
 /**
  * "Controller" object for the I Scream Zombies Game
  * @author Dan L. Dela Rosa
  */
 public class GameController {
+  static final String serverAddress = "http://iscreamzombies.heroku.com/";
+  
   // Make sure the object cannot instantiated externally
-  private GameController() {}
+  private GameController() {
+  }
   // This class is a Singleton
   private static final GameController instance = new GameController();
   // Right now, the controller managers only one game at a time
@@ -28,29 +31,74 @@ public class GameController {
     return instance;
   }
   
-  public synchronized void joinGame(String name) {
-    JSONObject object = new JSONObject();
+  /**
+   * @param requestAddress
+   */
+  private JSONObject sendGetRequestToServer(String requestAddress) {
+    String response = "";
     try {
-      object.put("name", name);
-    } catch (JSONException e) {
+      URL serverURL = new URL(requestAddress);
+      HttpURLConnection connection = 
+          (HttpURLConnection) serverURL.openConnection();
+      connection.connect();
+      BufferedReader is = new BufferedReader(
+          new InputStreamReader(connection.getInputStream()));
+      String inputLine;
+      while ((inputLine = is.readLine()) != null) {
+        response = response + inputLine;
+      }
+      return new JSONObject(response);
+    }
+    catch (Exception e) {
       e.printStackTrace();
     }
-    // TODO send request
-    // TODO get response
+    return new JSONObject();
   }
-  
+    
+  public synchronized void joinGame(String name) {
+  }
+
   public synchronized void getTurn() {
     // TODO send request
     // TODO get response
     gameModel.updateYourTurn(false);
   }
   
-  public synchronized void getGameState() {
-    // TODO send request
-    // TODO get response
-    GameBoard gameBoard = 
-        new GameBoard.GameBoardBuilder("", 0, 0).buildGameBoard();
-    gameModel.setGameBoard(gameBoard);
+  public synchronized void getGameState(String UUID) {
+    String requestAddress = serverAddress + "get_game_state/" + UUID;
+    JSONObject response = sendGetRequestToServer(requestAddress);
+    
+    try {
+      JSONObject gameBoardData = (JSONObject)response.get("game_board");
+      
+      JSONArray sizeData = (JSONArray)gameBoardData.get("size");
+      int width = sizeData.getInt(0);
+      int height = sizeData.getInt(1);
+      GameBoardBuilder gameBoardBuilder = 
+        new GameBoardBuilder(UUID, width, height);
+      
+      JSONArray knownTileData = (JSONArray)gameBoardData.get("known");
+      int knownTileIndex = 0;
+      while(!knownTileData.isNull(knownTileIndex)) {
+        JSONObject tileData = (JSONObject)knownTileData.get(knownTileIndex);
+        System.out.println(tileData);
+        knownTileIndex++;
+      }
+      
+      JSONObject playerData = (JSONObject)response.get("players");
+      
+      JSONObject yourPlayerData = (JSONObject)playerData.get("you");
+      System.out.print(yourPlayerData);
+      
+      JSONArray otherPlayerData = (JSONArray)playerData.get("others");
+      System.out.print(otherPlayerData);
+      
+      GameBoard gameBoard = gameBoardBuilder.buildGameBoard();
+      gameModel.setGameBoard(gameBoard);
+    }
+    catch (JSONException e) {
+      e.printStackTrace();
+    }
   }
   
   public synchronized void makeMove(int x, int y) {
