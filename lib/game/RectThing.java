@@ -5,8 +5,10 @@ package game;
 public class RectThing extends Thing
 {
    public RectThing(double x, double y, double width, double height) {
-      this.x = x + width / 2;
-      this.y = y + height / 2;
+      //this.x = x + width / 2;
+      //this.y = y + height / 2;
+     this.x = x;
+     this.y = y;
       X[0] = x;
       Y[0] = y;
       X[1] = x + width;

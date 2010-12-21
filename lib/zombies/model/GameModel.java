@@ -26,8 +26,9 @@ public class GameModel extends Observable {
   
   public void setGameBoard(GameBoard board) {
     this.board = board;
-    System.out.println("updated");
+    setChanged();
     notifyObservers(board);
+    clearChanged();
   }
   
   public GameBoard getGameBoard() {
@@ -36,6 +37,9 @@ public class GameModel extends Observable {
 
   public void setUUID(String uUID) {
     UUID = uUID;
+    setChanged();
+    notifyObservers(board);
+    clearChanged();
   }
 
   public String getUUID() {
@@ -44,17 +48,23 @@ public class GameModel extends Observable {
 
   public void updateYourTurn(boolean yourTurn) {
     board.updateYourTurn(yourTurn);
+    setChanged();
     notifyObservers(board);
+    clearChanged();
   }
 
   public void updateTile(int x, int y, Tile tile) {
     board.updateTile(x, y, tile);
+    setChanged();
     notifyObservers(board);
+    clearChanged();
   }
 
   public void updatePlayer(Player player) {
     board.updatePlayer(player);
+    setChanged();
     notifyObservers(board);
+    clearChanged();
   }
 
   public int getPlayerX() {

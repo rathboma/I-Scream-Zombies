@@ -7,6 +7,7 @@ import org.json.*;
 
 import zombies.model.*;
 import zombies.model.GameBoard.GameBoardBuilder;
+import zombies.model.Tile.TileBuilder;
 
 /**
  * "Controller" object for the I Scream Zombies Game
@@ -64,9 +65,10 @@ public class GameController {
     gameModel.updateYourTurn(false);
   }
   
-  public synchronized void getGameState(String UUID) {
+  public void getGameState(String UUID) {
     String requestAddress = serverAddress + "get_game_state/" + UUID;
     JSONObject response = sendGetRequestToServer(requestAddress);
+    System.out.println(response);
     
     try {
       JSONObject gameBoardData = (JSONObject)response.get("game_board");
@@ -82,16 +84,47 @@ public class GameController {
       while(!knownTileData.isNull(knownTileIndex)) {
         JSONObject tileData = (JSONObject)knownTileData.get(knownTileIndex);
         System.out.println(tileData);
+        
+        int tileX = tileData.getInt("x");
+        int tileY = tileData.getInt("y");
+        boolean isStore = false;
+        int zombies = 0;
+        try {
+          isStore = tileData.getBoolean("store");
+          zombies = tileData.getInt("zombies");
+        } 
+        catch (JSONException e) {
+          e.printStackTrace();
+        }
+        finally {
+          TileBuilder tileBuilder = new TileBuilder();
+          tileBuilder.isStore(isStore);
+          tileBuilder.withZombies(zombies);
+          Tile tile = tileBuilder.buildTile();
+          gameBoardBuilder.withKnownTile(tileX, tileY, tile);
+        }
         knownTileIndex++;
       }
       
       JSONObject playerData = (JSONObject)response.get("players");
       
       JSONObject yourPlayerData = (JSONObject)playerData.get("you");
-      System.out.print(yourPlayerData);
+      System.out.println(yourPlayerData);
       
       JSONArray otherPlayerData = (JSONArray)playerData.get("others");
-      System.out.print(otherPlayerData);
+      System.out.println(otherPlayerData);
+      
+      JSONObject costData = (JSONObject)response.get("costs");
+      System.out.println(costData);
+      
+      JSONObject basePriceData = (JSONObject)response.get("prices");
+      System.out.println(basePriceData);
+      
+      boolean win = response.getBoolean("win");
+      gameBoardBuilder.isWin(win);
+      
+      boolean isGameOver = response.getBoolean("game_over");
+      gameBoardBuilder.isGameOver(isGameOver);
       
       GameBoard gameBoard = gameBoardBuilder.buildGameBoard();
       gameModel.setGameBoard(gameBoard);
