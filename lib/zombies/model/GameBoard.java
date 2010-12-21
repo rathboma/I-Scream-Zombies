@@ -239,6 +239,14 @@ public class GameBoard {
       return basePrice[flavor];
     }
   }
+  
+  public int getWidth() {
+    return tiles.length;
+  }
+  
+  public int getHeight() {
+    return tiles[0].length;
+  }
 
   /**
    * Overwrite the client's player data
