@@ -1,30 +1,43 @@
+require 'rubygems'
+require 'json'
+
 # Usage: Create a new client object. Then call make_move with the gamestate. Then call take_action with the tilestate
 module AIPlayer
 	class Client
 		attr_accessor :board, :player, :others, :base_prices, :costs
 
-		def initialize(); end
+		def initialize();
+			data = ''
+			File.open("sample-gamestate", "r").each_line{|line| data += line }
+			puts make_move!(JSON.parse(data)).inspect
+			puts take_action!(nil).inspect
+		end
+
 		def all_player_locations(include_self = true); include_self ? other_player_locations << player_location : other_player_locations end
 		def get_tile(location); @board.get_tile(location) end
 		def player_location; @player.location end
 		def other_player_locations; @others.map(&:location) end
 
-		def make_move(gamestate)
-			if !gamestate[:game_over] && gamestate[:your_turn]
-				@base_prices = {	"V" => gamestate[:base_prices]["V"],
-									"C" => gamestate[:base_prices]["C"],
-									"S" => gamestate[:base_prices]["S"] }
-				@costs = {	"V" => gamestate[:costs]["V"],
-							"C" => gamestate[:costs]["C"],
-							"S" => gamestate[:costs]["S"] }
-				@board = AIPlayer::Board.new(gamestate[:board])
-				@player = AIPlayer::Player.new(gamestate[:players][:you], :self)
-				@others = gamestate[:players][:others].map{|o| AIPlayer::Player.new(o)}
-				choose_move!
+		def make_move!(gamestate)
+			@base_prices =	{ "V" => gamestate["prices"]["V"]	\
+							, "C" => gamestate["prices"]["C"]	\
+							, "S" => gamestate["prices"]["S"]	}
+			@costs =		{ "V" => gamestate["costs"]["V"]	\
+							, "C" => gamestate["costs"]["C"]	\
+							, "S" => gamestate["costs"]["S"]	}
+			@board = AIPlayer::Board.new(gamestate["game_board"], self)
+			@player = AIPlayer::Player.new(gamestate["players"]["you"], :self)
+			@others = gamestate["players"]["others"].map{|o| AIPlayer::Player.new(o)}
+			if !gamestate["game_over"] && gamestate["players"]["you"]["turn"]
+				choose_move
+			elsif !gamestate["game_over"]
+				{:error => "Not my turn!"}
+			else
+				{:error => "Game Over"}
 			end
 		end
 
-		def choose_move!
+		def choose_move
 			if @player.inventory_low?
 				move_towards_store
 			else
@@ -132,8 +145,9 @@ module AIPlayer
 		def initialize(hashdata, client)
 			@client = client
 			@stores = []
-			@dimensions = {:x => hashdata[:size].first, :y => hashdata[:size].last}
-			@tiles = hashdata[:known].map{|t| Tile.new(t, self)}
+			@dimensions =	{ :x => hashdata["size"].first	\
+							, :y => hashdata["size"].last	}
+			@tiles = hashdata["known"].collect{|t| Tile.new(t, self)}
 		end
 
 
@@ -143,9 +157,9 @@ module AIPlayer
 			adjacencies.map{|(dx, dy)| get_tile(:x => x + dx, :y => y + dy)}.compact
 		end
 
-		def get_tile(location)
-			if x+dx > 0 && x+dx < @dimensions[:x] && y+dy > 0 && y+dy < @dimensions[:y] # If in bounds
-				@tiles.select{|t| t.x == x+dx && t.y == y+dy}.first || Tile.new({:x => x+dx, :y => y+dy}, @board, false)
+		def get_tile(loc)
+			if loc[:x] && loc[:y] && loc[:x] > 0 && loc[:x] < @dimensions[:x] && loc[:y] > 0 && loc[:y] < @dimensions[:y] # If in bounds
+				@tiles.select{|t| t.x == loc[:x] && t.y == loc[:y]}.first || Tile.new({:x => loc[:x], :y => loc[:y]}, @board, false)
 			else
 				nil
 			end
@@ -164,11 +178,11 @@ module AIPlayer
 		def initialize(hashdata, board, visible = true)
 			@board = board
 			@visible = visible
-			@x = hashdata[:x]
-			@y = hashdata[:y]
-			@zombies = hashdata[:zombies]
-			@customers = hashdata[:customers].map{|c| Customer.new(c, self)}
-			if hashdata[:store]
+			@x = hashdata["x"]
+			@y = hashdata["y"]
+			@zombies = hashdata["zombies"]
+			@customers = hashdata["customers"].map{|c| Customer.new(c, self)}
+			if hashdata["store"]
 				@board.add_store(self)
 				@store = true
 			end
@@ -196,12 +210,10 @@ module AIPlayer
 
 		def initialize(hashdata, tile)
 			@tile = tile
-			@id = hashdata[:id]
-			@favorite = {
-				:type => hashdata[:favorite_type],
-				:price => hashdata[:favorite_price],
-				:number => hashdata[:favorite_number],
-			}
+			@id = hashdata["id"]
+			@favorite = { :type => hashdata["favorite_type"]	\
+						, :price => hashdata["favorite_price"]	\
+						, :number => hashdata["favorite_number"]}
 		end
 
 		def base_prices; @tile.base_prices end
@@ -212,16 +224,16 @@ module AIPlayer
 
 		def initialize(hashdata, who = :other)
 			@who = who
-			@location = {:x => hashdata[:x], :y => hashdata[:y]}
-			@prev_location = {:x => hashdata[:prev_x], :y => hashdata[:prev_y]}
-			@score = hashdata[:score]
-			@money = hashdata[:money]
+			@location = {:x => hashdata["x"], :y => hashdata["y"]}
+			@prev_location = {:x => hashdata["prev_x"], :y => hashdata["prev_y"]}
+			@score = hashdata["score"]
+			@money = hashdata["money"]
 			@inventory = if (who == :self)
-				{	:v => hashdata[:vanilla],
-					:c => hashdata[:chocolate],
-					:s => hashdata[:strawberry] }
+				{ :v => hashdata["vanilla"]		\
+				, :c => hashdata["chocolate"]	\
+				, :s => hashdata["strawberry"]	}
 			else
-				nil
+				{}
 			end
 			@kills = hashdata[:kills]
 			@sales = hashdata[:sales]
@@ -236,3 +248,7 @@ module AIPlayer
 		end
 	end
 end
+
+###
+
+AIPlayer::Client.new
