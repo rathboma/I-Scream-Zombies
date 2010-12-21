@@ -53,14 +53,12 @@ public class GameApplet extends Platform implements Observer {
   }
 
   public void update(Observable arg0, Object arg1) {
-    System.out.println("updated");
     if (!(arg1 instanceof GameBoard)) {
       return;
     }
-    System.out.println("updated");
     
     GameBoard board = (GameBoard)arg1;
-    System.out.println("updated");
+    
     // Clear mini-map
     for (int x = 0; x < miniTiles.length; x++) {
       for (int y = 0; y < miniTiles[x].length; y++) {
@@ -81,6 +79,5 @@ public class GameApplet extends Platform implements Observer {
         addThing(miniTile);
       }
     }
-    System.out.println(miniTiles);
   }
 }

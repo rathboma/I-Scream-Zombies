@@ -114,6 +114,18 @@ public class GameController {
       JSONArray otherPlayerData = (JSONArray)playerData.get("others");
       System.out.println(otherPlayerData);
       
+      JSONObject costData = (JSONObject)response.get("costs");
+      System.out.println(costData);
+      
+      JSONObject basePriceData = (JSONObject)response.get("prices");
+      System.out.println(basePriceData);
+      
+      boolean win = response.getBoolean("win");
+      gameBoardBuilder.isWin(win);
+      
+      boolean isGameOver = response.getBoolean("game_over");
+      gameBoardBuilder.isGameOver(isGameOver);
+      
       GameBoard gameBoard = gameBoardBuilder.buildGameBoard();
       gameModel.setGameBoard(gameBoard);
     }
