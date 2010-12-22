@@ -122,6 +122,8 @@ module AIPlayer
 				kill_zombies
 			elsif curr.customers.size > 0
 				sell_ice_cream
+			elsif curr.store
+				buy_inventory
 			elsif prev && (prev.zombies + prev.customers.size) > 0 && (curr.zombies + curr.customers.size) == 0
 				run_away
 			else
@@ -131,7 +133,7 @@ module AIPlayer
 
 		def kill_zombies
 			# TODO
-			:kill_zombies
+			:kill
 		end
 
 		def sell_ice_cream
@@ -142,6 +144,11 @@ module AIPlayer
 		def run_away
 			# TODO
 			:run
+		end
+
+		def buy_inventory
+			# TODO
+			:buy
 		end
 
 		def do_nothing
