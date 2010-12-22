@@ -19,7 +19,19 @@ public class TileView extends RectThing {
 	  makeStatic();
 	}
 	
-	public void discover(){
+	public void isOutOfBounds() {
+	  setColor(Color.BLACK);
+	}
+	
+	public void isHidden() {
+	  setColor(Color.DARK_GRAY);
+	}
+	
+	public void isCurrent() {
+	  setColor(Color.WHITE);
+	}
+	
+	public void discover() {
 		setColor(Color.lightGray);
 	}
 }

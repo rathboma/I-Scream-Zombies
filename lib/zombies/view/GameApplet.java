@@ -1,6 +1,7 @@
 package zombies.view;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.Observable;
 import java.util.Observer;
@@ -21,14 +22,19 @@ public class GameApplet extends Platform implements Observer {
   private static final long serialVersionUID = -8728170048736426649L; 
   
   Thing minimap  = new RectThing(420, 0, 0, 0);
-  TileView[][] tiles = new TileView[5][5];
+  int bigMapWidth = 5;
+  int bigMapHeight = 5;
+  TileView[][] tiles = new TileView[bigMapWidth][bigMapHeight];
+  String[][] tileLabels = new String[bigMapWidth][bigMapHeight];
   MiniTileView[][] miniTiles = new MiniTileView[0][0];
+  Font font = new Font("Helvetica", Font.BOLD, 14);
   
   public void setup() {
     for(int x = 0; x < 5; x++) {
       for(int y = 0; y < 5; y++) {
         TileView tile = new TileView(x, y, this);
         tiles[x][y] = tile;
+        tileLabels[x][y] = "";
         addThing(tile);
         MiniTileView miniTile = new MiniTileView(x, y, this);
         addThing(miniTile);
@@ -49,7 +55,16 @@ public class GameApplet extends Platform implements Observer {
   public void update(){
   }
   
-  public void overlay(Graphics g){
+  public void overlay(Graphics g) {
+    g.setColor(Color.black);
+    g.setFont(font);
+    for (int x = 0; x < tileLabels.length; x++) {
+      for (int y = 0; y < tileLabels[x].length; y++) {
+        int placeX = (int)tiles[x][y].getX() + 10;
+        int placeY = (int)tiles[x][y].getY() + 20;
+        g.drawString(tileLabels[x][y], placeX, placeY);
+      }
+    }
   }
 
   public void update(Observable arg0, Object arg1) {
@@ -77,6 +92,36 @@ public class GameApplet extends Platform implements Observer {
           miniTile.discover();
         }
         addThing(miniTile);
+      }
+    }
+    
+    // clear big map
+    for (int x = 0; x < tiles.length; x++) {
+      for (int y = 0; y < tiles[x].length; y++) {
+        removeThing(tiles[x][y]);
+      }
+    }
+    
+    // make new big map
+    for (int x = 0; x < tiles.length; x++) {
+      for (int y = 0; y < tiles[x].length; y++) {
+        TileView tile = new TileView(x, y, this);
+        int translateX = x + board.getYou().getX() - 2;
+        int translateY = y + board.getYou().getY() - 2;
+        tileLabels[x][y] = "(" + translateX + "," + translateY + ")";
+        if (!board.inBounds(translateX, translateY)) {
+          tile.isOutOfBounds();
+        }
+        else if (board.getTileAt(translateX, translateY) == Tile.UnknownTile) {
+          tile.isHidden();
+        }
+        else if (x == 2 && y == 2) {
+          tile.isCurrent();
+        }
+        else {
+          tile.discover();
+        }
+        addThing(tile);
       }
     }
   }
