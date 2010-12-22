@@ -10,7 +10,9 @@ module AIPlayer
 			data = ''
 			File.open("sample-gamestate", "r").each_line{|line| data += line }
 			puts make_move!(JSON.parse(data)).inspect
-			puts take_action!(nil).inspect
+			data = ''
+			File.open("sample-turnstate", "r").each_line{|line| data += line }
+			puts take_action!(JSON.parse(data)).inspect
 		end
 
 		def all_player_locations(include_self = true); include_self ? other_player_locations << player_location : other_player_locations end
@@ -120,7 +122,7 @@ module AIPlayer
 				kill_zombies
 			elsif curr.customers.size > 0
 				sell_ice_cream
-			elsif (prev.zombies + prev.customers.size) > 0 && (curr.zombies + curr.customers.size) == 0
+			elsif prev && (prev.zombies + prev.customers.size) > 0 && (curr.zombies + curr.customers.size) == 0
 				run_away
 			else
 				do_nothing
@@ -129,14 +131,22 @@ module AIPlayer
 
 		def kill_zombies
 			# TODO
+			:kill_zombies
 		end
 
 		def sell_ice_cream
 			# TODO
+			:sell
 		end
 
 		def run_away
 			# TODO
+			:run
+		end
+
+		def do_nothing
+			# TODO
+			:hold
 		end
 	end
 
