@@ -132,28 +132,38 @@ module AIPlayer
 		end
 
 		def kill_zombies
-			# TODO
 			{:action => :kill}
 		end
 
 		def sell_ice_cream
-			# TODO
-			{:action => :sell}
+			sale = choose_best_sale()
+			{ :action => :sell				\
+			, :customer => sale.customer	\
+			, :flavor => sale.flavor		\
+			, :number => sale.number		}
 		end
 
 		def run_away
-			# TODO
 			{:action => :run}
 		end
 
 		def buy_inventory
-			# TODO
-			{:action => :buy}
+			purchase = purchase_from_store()
+			{ :action => :buy				\
+			, :flavor => purchase.flavor	\
+			, :number => purchase.number	}
 		end
 
 		def do_nothing
+			kill_zombies
+		end
+
+		def choose_best_sale()
 			# TODO
-			{:action => :kill}
+		end
+
+		def purchase_from_store()
+			# TODO
 		end
 	end
 
