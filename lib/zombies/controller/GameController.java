@@ -295,6 +295,7 @@ public class GameController {
     System.out.println("Getting turn...");
     String requestAddress = serverAddress + "get_turn/" + UUID;
     JSONObject response = sendGetRequestToServer(requestAddress);
+    System.out.println(response);
     
     if (response.isNull("turn")) {
       System.out.println("Warning: turn is null");
