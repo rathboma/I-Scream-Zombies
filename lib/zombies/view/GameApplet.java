@@ -7,8 +7,10 @@ import java.util.Observable;
 import java.util.Observer;
 
 import zombies.controller.GameController;
+import zombies.model.Flavors;
 import zombies.model.GameBoard;
 import zombies.model.GameModel;
+import zombies.model.Player;
 import zombies.model.Tile;
 
 import game.Platform;
@@ -31,6 +33,52 @@ public class GameApplet extends Platform implements Observer {
   MiniTileView[][] miniTiles = new MiniTileView[0][0];
   Font font = new Font("Helvetica", Font.BOLD, 14);
   
+  Thing joinButton = new RectThing(0, 420, 40, 20) {
+    public boolean mouseDown(int x, int y) {
+      joinGame();
+      return false;
+   }
+  };
+  
+  Thing buyButton = new RectThing(50, 420, 40, 20) {
+    public boolean mouseDown(int x, int y) {
+      controller.buy(0, 0);
+      return false;
+   }
+  };
+  
+  Thing sellButton = new RectThing(100, 420, 40, 20) {
+    public boolean mouseDown(int x, int y) {
+      controller.sell("", 0, 0);
+      return false;
+   }
+  };
+  
+  Thing killButton = new RectThing(150, 420, 40, 20) {
+    public boolean mouseDown(int x, int y) {
+      controller.kill();
+      return false;
+   }
+  };
+  
+  Thing runButton = new RectThing(200, 420, 40, 20) {
+    public boolean mouseDown(int x, int y) {
+      controller.run();
+      return false;
+   }
+  };
+  
+  String playerLabel1 = "";
+  String playerLabel2 = "";
+  
+  GameModel model = GameModel.getInstance();
+  GameController controller = GameController.getInstance();
+  
+  int refreshTimer = 0;
+  
+  /**
+   * 
+   */
   public void setup() {
     for(int x = 0; x < 5; x++) {
       for(int y = 0; y < 5; y++) {
@@ -46,17 +94,38 @@ public class GameApplet extends Platform implements Observer {
     minimap.setColor(Color.WHITE);
     addThing(minimap);
     
-    GameModel model = GameModel.getInstance();
-    model.addObserver(this);
+    joinButton.setColor(Color.WHITE);
+    addThing(joinButton);
     
-    GameController controller = GameController.getInstance();
-    controller.getGameState("NCQNWTPPJVBTLJSS");
-    //controller.joinGame("Player 1");
+    buyButton.setColor(Color.WHITE);
+    addThing(buyButton);
+    
+    sellButton.setColor(Color.WHITE);
+    addThing(sellButton);
+    
+    killButton.setColor(Color.WHITE);
+    addThing(killButton);
+    
+    runButton.setColor(Color.WHITE);
+    addThing(runButton);
   }
   
+  /**
+   * 
+   */
   public void update(){
+    if (refreshTimer < 300) {
+      refreshTimer++;
+    }
+    else {
+      controller.getTurn("NCQNWTPPJVBTLJSS");
+      refreshTimer = 0;
+    }
   }
   
+  /**
+   * 
+   */
   public void overlay(Graphics g) {
     g.setColor(Color.black);
     g.setFont(font);
@@ -67,13 +136,45 @@ public class GameApplet extends Platform implements Observer {
         g.drawString(tileLabels[x][y], placeX, placeY);
       }
     }
+    g.drawString("Join", (int)joinButton.getX() + 5, 
+        (int)joinButton.getY() + 15);
+    g.drawString("Buy", (int)buyButton.getX() + 5, 
+            (int)buyButton.getY() + 15);
+    g.drawString("Sell", (int)sellButton.getX() + 5, 
+            (int)sellButton.getY() + 15);
+    g.drawString("Kill", (int)killButton.getX() + 5, 
+            (int)killButton.getY() + 15);
+    g.drawString("Run", (int)runButton.getX() + 5, 
+            (int)runButton.getY() + 15);
+    g.drawString(playerLabel1, 10, 460);
+    g.drawString(playerLabel2, 10, 480);
   }
   
+  /**
+   * 
+   */
+  public void joinGame() {
+    model.addObserver(this);
+    model.setUUID("NCQNWTPPJVBTLJSS");
+    
+    controller.getGameState("NCQNWTPPJVBTLJSS");
+    
+    //controller.joinGame("Player 1");
+  }
+  
+  /**
+   * 
+   * @param x
+   * @param y
+   */
   public void moveToTile(int x, int y) {
     GameController controller = GameController.getInstance();
     controller.makeMove(translateX[x][y], translateY[x][y]);
   }
-
+  
+  /**
+   * 
+   */
   public void update(Observable arg0, Object arg1) {
     if (!(arg1 instanceof GameBoard)) {
       return;
@@ -133,5 +234,25 @@ public class GameApplet extends Platform implements Observer {
         addThing(tile);
       }
     }
+    Player yourPlayer = board.getYou();
+    StringBuilder playerLabelBuilder = new StringBuilder();
+    playerLabelBuilder.append("Money: " + yourPlayer.getMoney());
+    playerLabelBuilder.append(" ");
+    playerLabelBuilder.append("Sales: " + yourPlayer.getSales());
+    playerLabelBuilder.append(" ");
+    playerLabelBuilder.append("Zombie Kills: " + yourPlayer.getKills());
+    playerLabelBuilder.append(" ");
+    playerLabel1 = playerLabelBuilder.toString();
+    playerLabelBuilder = new StringBuilder();
+    playerLabelBuilder.append("C: " 
+            + yourPlayer.getInstancesOf(Flavors.CHOCOLATE));
+    playerLabelBuilder.append(" ");
+    playerLabelBuilder.append("S: " 
+            + yourPlayer.getInstancesOf(Flavors.STRAWBERRY));
+    playerLabelBuilder.append(" ");
+    playerLabelBuilder.append("V: " 
+            + yourPlayer.getInstancesOf(Flavors.VANILLA));
+    playerLabelBuilder.append(" ");
+    playerLabel2 = playerLabelBuilder.toString();
   }
 }

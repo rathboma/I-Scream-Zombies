@@ -37,9 +37,6 @@ public class GameModel extends Observable {
 
   public void setUUID(String uUID) {
     UUID = uUID;
-    setChanged();
-    notifyObservers(board);
-    clearChanged();
   }
 
   public String getUUID() {
