@@ -3,10 +3,10 @@
 	"y":55,
 	"customers":[
 		{
-			"id":1,
-			"favorite_type":"C,S,V",
+			"id":22,
+			"favorite_type":"C,C,V",
 			"favorite_price":5,
-			"favorite_number":2
+			"favorite_number":4
 		}
 	],
 	"zombies":null,

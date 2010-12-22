@@ -121,7 +121,7 @@ module AIPlayer
 			if curr.zombies > 0
 				kill_zombies
 			elsif curr.customers.size > 0
-				sell_ice_cream
+				sell_ice_cream(curr, @player.inventory)
 			elsif curr.store
 				buy_inventory
 			elsif prev && (prev.zombies + prev.customers.size) > 0 && (curr.zombies + curr.customers.size) == 0
@@ -135,12 +135,12 @@ module AIPlayer
 			{:action => :kill}
 		end
 
-		def sell_ice_cream
-			sale = choose_best_sale()
-			{ :action => :sell				\
-			, :customer => sale.customer	\
-			, :flavor => sale.flavor		\
-			, :number => sale.number		}
+		def sell_ice_cream(curr, inv)
+			sale = choose_best_sale(curr, inv)
+			{ :action =>	:sell				\
+			, :customer =>	sale.customer.id	\
+			, :flavor =>	sale.flavor			\
+			, :number =>	sale.number			}
 		end
 
 		def run_away
@@ -158,8 +158,9 @@ module AIPlayer
 			kill_zombies
 		end
 
-		def choose_best_sale()
-			# TODO
+		def choose_best_sale(tile, inv)
+			options = tile.customers.collect{|c| c.find_sale(inv)} #TODO, collect option
+			options.max{|i,j| i.score <=> j.score}
 		end
 
 		def purchase_from_store()
@@ -255,12 +256,16 @@ module AIPlayer
 		def initialize(hashdata, tile)
 			@tile = tile
 			@id = hashdata["id"]
-			@favorite = { :type => hashdata["favorite_type"]	\
+			@favorite = { :flavor => hashdata["favorite_type"]	\
 						, :price => hashdata["favorite_price"]	\
 						, :number => hashdata["favorite_number"]}
 		end
 
 		def base_prices; @tile.base_prices end
+
+		def find_sale(inv)
+			Sale.new(@favorite, base_prices, inv, self)
+		end
 	end
 
 	class Player
@@ -268,27 +273,72 @@ module AIPlayer
 
 		def initialize(hashdata, who = :other)
 			@who = who
-			@location = {:x => hashdata["x"], :y => hashdata["y"]}
-			@prev_location = {:x => hashdata["prev_x"], :y => hashdata["prev_y"]}
-			@score = hashdata["score"]
-			@money = hashdata["money"]
-			@inventory = if (who == :self)
-				{ :v => hashdata["vanilla"]		\
-				, :c => hashdata["chocolate"]	\
-				, :s => hashdata["strawberry"]	}
-			else
-				{}
-			end
-			@kills = hashdata[:kills]
-			@sales = hashdata[:sales]
-			@turns_remaining = hashdata[:turns_remaining]
-			@can_act = hashdata[:can_act]
-			@can_move = hashdata[:can_move]
+			@inventory = (@who == :self) ?	{ :v => hashdata["vanilla"]		\
+											, :c => hashdata["chocolate"]	\
+											, :s => hashdata["strawberry"]	} : {}
+			@prev_location =	{:x => hashdata["prev_x"],	:y => hashdata["prev_y"]}
+			@location = 		{:x => hashdata["x"],		:y => hashdata["y"]}
+			@score =	hashdata["score"]
+			@money =	hashdata["money"]
+			@kills =	hashdata["kills"]
+			@sales =	hashdata["sales"]
+			@can_act =	hashdata["can_act"]
+			@can_move =	hashdata["can_move"]
+			@turns_remaining = hashdata["turns_remaining"]
 		end
 
 		def inventory_low?
 			v, c, s = @inventory[:v], @inventory[:c], @inventory[:s]
 			[v,c,s].max < 4 || v+c+s < 10
+		end
+	end
+
+	class Sale
+		attr_reader :flavor, :number, :price, :customer
+
+		def initialize(fav, bases, inv, customer)
+			@customer = customer
+			bases = bases.clone
+			bases.delete "C" if inv[:c] < 1
+			bases.delete "S" if inv[:s] < 1
+			bases.delete "V" if inv[:v] < 1
+
+			options = {}
+			bases.each{|k,v| options[k] = {:price => v, :number => 1}}
+
+			hunger = fav[:number]
+			if hunger >= 1
+				ingredients = fav[:flavor].split ","
+				unspent = [inv[:c],	inv[:s],	inv[:v]]
+				flv_idx = ["C",		"S",		"V"]
+				amount = 0
+				price = 0
+				until hunger < 1 || ingredients.empty? || unspent.inject{|s,v| s += v} == 0
+					flavor = ingredients.pop.upcase
+					i = case flavor
+					when "C" ; 0
+					when "S" ; 1
+					when "V" ; 2
+					end
+					break if unspent[flv_idx.index(flavor)] < 1
+					unspent[flv_idx.index(flavor)] -= 1
+					if ingredients.empty?
+						price += fav[:price]
+						ingredients = fav[:flavor].split ","
+						hunger -= 1
+						amount += 1
+					end
+				end
+				options.merge!({fav[:flavor] => {:number => amount, :price => price}}) if amount > 0
+			end
+			best = {:flavor => "", :price => 0, :number => 0}
+			options.each do |k,v|
+				best = {:flavor => k, :price => v[:price], :number => v[:number]} if v[:price] >= best[:price]
+			end
+			@flavor = best[:flavor]
+			@number = best[:number]
+			@price = best[:price]
+			best
 		end
 	end
 end
