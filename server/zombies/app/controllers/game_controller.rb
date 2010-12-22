@@ -34,7 +34,7 @@ class GameController < ApplicationController
       render :json => {:error => "player not found"}
       return
     end
-    render :json => {:turn => @player.turn}
+    render :json => {:turn => @player.turn?}
   end
   #sends player.uuid
   def get_game_state

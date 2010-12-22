@@ -272,7 +272,8 @@ public class GameController {
    * @param name
    */
   public synchronized void joinGame(String name) {
-    String requestAddress = serverAddress + "join_game/";
+    System.out.println("Finding a game for you...");
+    String requestAddress = serverAddress + "join/";
     JSONObject request = new JSONObject();
     try {
       request.put("name", name);
@@ -281,7 +282,7 @@ public class GameController {
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       String UUID = response.getString("uuid");
       gameModel.setUUID(UUID);
-    } 
+    }
     catch (Exception e) {
       System.out.println(e);
     }
@@ -291,8 +292,10 @@ public class GameController {
    * 
    */
   public synchronized void getTurn(String UUID) {
+    System.out.println("Getting turn...");
     String requestAddress = serverAddress + "get_turn/" + UUID;
     JSONObject response = sendGetRequestToServer(requestAddress);
+    System.out.println(response);
     
     if (response.isNull("turn")) {
       System.out.println("Warning: turn is null");
@@ -302,6 +305,12 @@ public class GameController {
       try {
         isYourTurn = response.getBoolean("turn");
         gameModel.updateYourTurn(isYourTurn);
+        if (isYourTurn) {
+          System.out.println("Yes! It's your turn!");
+        }
+        else {
+          System.out.println("It's not your turn yet...");
+        }
       } catch (JSONException e) {
         System.out.println(e);
       }
@@ -309,9 +318,9 @@ public class GameController {
   }
   
   public void getGameState(String UUID) {
+    System.out.println("Getting game state...");
     String requestAddress = serverAddress + "get_game_state/" + UUID;
     JSONObject response = sendGetRequestToServer(requestAddress);
-    System.out.println("Getting game state...");
     System.out.println(response);
     
     try {
@@ -350,6 +359,7 @@ public class GameController {
             (JSONObject)otherPlayerData.get(otherPlayerIndex);
         Player player = parsePlayerData(anotherPlayerData);
         otherPlayersList.add(player);
+        otherPlayerIndex++;
       }
       Player[] otherPlayersArray = new Player[otherPlayersList.size()];
       for (int i = 0; i < otherPlayersList.size(); i++) {
@@ -422,7 +432,6 @@ public class GameController {
       request.put("uuid", gameModel.getUUID());
       request.put("x", x);
       request.put("y", y);
-      //JSONObject response = sendGetRequestToServer(requestAddress + request);
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       System.out.println("Moving to " + x + ", " + y + "...");
       System.out.println(response);
