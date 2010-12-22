@@ -17,6 +17,7 @@ class Tile < ActiveRecord::Base
         t.customers << Customer.generate
       end
     end
+    t.zombies ||= 0
     t.save!
     t
   end
