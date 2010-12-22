@@ -31,7 +31,7 @@ module AIPlayer
 			@player = AIPlayer::Player.new(gamestate["players"]["you"], :self)
 			@others = gamestate["players"]["others"].map{|o| AIPlayer::Player.new(o)}
 			if !gamestate["game_over"] && gamestate["players"]["you"]["turn"]
-				choose_move
+				choose_move.location
 			elsif !gamestate["game_over"]
 				{:error => "Not my turn!"}
 			else
