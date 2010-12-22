@@ -30,6 +30,7 @@ public class GameApplet extends Platform implements Observer {
   int[][] translateX = new int[bigMapWidth][bigMapHeight];
   int[][] translateY = new int[bigMapWidth][bigMapHeight];
   String[][] tileLabels = new String[bigMapWidth][bigMapHeight];
+  String[][] tileLabels2 = new String[bigMapWidth][bigMapHeight];
   MiniTileView[][] miniTiles = new MiniTileView[0][0];
   Font font = new Font("Helvetica", Font.BOLD, 14);
   
@@ -76,8 +77,6 @@ public class GameApplet extends Platform implements Observer {
   
   int refreshTimer = 0;
   
-  
-  
   /**
    * 
    */
@@ -88,6 +87,7 @@ public class GameApplet extends Platform implements Observer {
         TileView tile = new TileView(x, y, this);
         tiles[x][y] = tile;
         tileLabels[x][y] = "";
+        tileLabels2[x][y] = "";
         addThing(tile);
         MiniTileView miniTile = new MiniTileView(x, y, this);
         addThing(miniTile);
@@ -100,16 +100,16 @@ public class GameApplet extends Platform implements Observer {
     joinButton.setColor(Color.WHITE);
     addThing(joinButton);
     
-    buyButton.setColor(Color.WHITE);
+    buyButton.setColor(Color.LIGHT_GRAY);
     addThing(buyButton);
     
-    sellButton.setColor(Color.WHITE);
+    sellButton.setColor(Color.LIGHT_GRAY);
     addThing(sellButton);
     
-    killButton.setColor(Color.WHITE);
+    killButton.setColor(Color.LIGHT_GRAY);
     addThing(killButton);
     
-    runButton.setColor(Color.WHITE);
+    runButton.setColor(Color.LIGHT_GRAY);
     addThing(runButton);
   }
   
@@ -119,7 +119,7 @@ public class GameApplet extends Platform implements Observer {
   public void update(){
     String uuid = model.getUUID();
     if (uuid != "" && !model.isYourTurn()) {
-      if (refreshTimer < 300) {
+      if (refreshTimer < 150) {
         refreshTimer++;
       }
       else {
@@ -140,6 +140,7 @@ public class GameApplet extends Platform implements Observer {
         int placeX = (int)tiles[x][y].getX() + 10;
         int placeY = (int)tiles[x][y].getY() + 20;
         g.drawString(tileLabels[x][y], placeX, placeY);
+        g.drawString(tileLabels2[x][y], placeX, placeY + 20);
       }
     }
     g.drawString("Join", (int)joinButton.getX() + 5, 
@@ -168,6 +169,7 @@ public class GameApplet extends Platform implements Observer {
     String uuid = model.getUUID();
     System.out.println("Joined game: " + uuid);
     controller.getGameState(uuid);
+    joinButton.setColor(Color.LIGHT_GRAY);
   }
   
   /**
@@ -234,6 +236,8 @@ public class GameApplet extends Platform implements Observer {
           tile.isHidden();
         }
         else if (x == 2 && y == 2) {
+          tileLabels2[x][y] = "Zs: " 
+            + board.getTileAt(translateX, translateY).getZombies();
           tile.isCurrent();
         }
         else {
