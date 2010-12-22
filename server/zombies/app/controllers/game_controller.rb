@@ -29,7 +29,11 @@ class GameController < ApplicationController
   
   #get
   def get_turn
-    @player = Player.find_by_uuid(params[:id])
+    @player = Player.find_by_uuid(params[:uuid])
+    if !@player
+      render :json {:error => "player not found"}
+      return
+    end
     render :json => {:turn => @player.turn}
   end
   #sends player.uuid

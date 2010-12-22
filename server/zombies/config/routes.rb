@@ -10,6 +10,8 @@ Zombies::Application.routes.draw do
   match 'move' => 'game#post_make_move', :via => :post
   match 'get_game_state/:uuid' => 'game#get_game_state', :via => :get
   match 'show/:uuid' => 'game#show', :via => :get
+  match 'get_turn/:uuid' => 'game#get_turn', :via => :get
+  
   
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'
