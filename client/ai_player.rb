@@ -6,13 +6,15 @@ module AIPlayer
 	class Client
 		attr_accessor :board, :player, :others, :base_prices, :costs
 
-		def initialize();
-			data = ''
-			File.open("sample-gamestate", "r").each_line{|line| data += line }
-			puts make_move!(JSON.parse(data)).inspect
-			data = ''
-			File.open("sample-turnstate", "r").each_line{|line| data += line }
-			puts take_action!(JSON.parse(data)).inspect
+		def initialize(debug = false);
+			if debug
+				data = ''
+				File.open("sample-gamestate", "r").each_line{|line| data += line }
+				puts make_move!(JSON.parse(data)).inspect
+				data = ''
+				File.open("sample-turnstate", "r").each_line{|line| data += line }
+				puts take_action!(JSON.parse(data)).inspect
+			end
 		end
 
 		def all_player_locations(include_self = true); include_self ? other_player_locations << player_location : other_player_locations end
@@ -357,4 +359,4 @@ end
 
 ###
 
-AIPlayer::Client.new
+AIPlayer::Client.new(true)
