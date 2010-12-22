@@ -119,7 +119,7 @@ public class GameApplet extends Platform implements Observer {
   public void update(){
     String uuid = model.getUUID();
     if (uuid != "" && !model.isYourTurn()) {
-      if (refreshTimer < 150) {
+      if (refreshTimer < 75) {
         refreshTimer++;
       }
       else {
