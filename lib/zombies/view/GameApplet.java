@@ -123,14 +123,7 @@ public class GameApplet extends Platform implements Observer {
         refreshTimer++;
       }
       else {
-        System.out.println("Getting turn...");
         controller.getTurn(uuid);
-        if (model.isYourTurn()) {
-          System.out.println("Yes! It's your turn!");
-        }
-        else {
-          System.out.println("It's not your turn yet...");
-        }
         refreshTimer = 0;
       }
     }
@@ -269,5 +262,19 @@ public class GameApplet extends Platform implements Observer {
             + yourPlayer.getInstancesOf(Flavors.VANILLA));
     playerLabelBuilder.append(" ");
     playerLabel2 = playerLabelBuilder.toString();
+    
+    // Show whether it is your turn
+    if (!board.isYourTurn()) {
+      buyButton.setColor(Color.LIGHT_GRAY);
+      sellButton.setColor(Color.LIGHT_GRAY);
+      killButton.setColor(Color.LIGHT_GRAY);
+      runButton.setColor(Color.LIGHT_GRAY);
+    }
+    else {
+      buyButton.setColor(Color.WHITE);
+      sellButton.setColor(Color.WHITE);
+      killButton.setColor(Color.WHITE);
+      runButton.setColor(Color.WHITE);
+    }
   }
 }

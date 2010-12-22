@@ -48,6 +48,7 @@ public class GameModel extends Observable {
   }
   
   public void updateYourTurn(boolean yourTurn) {
+    if (yourTurn == board.isYourTurn()) return;
     board.updateYourTurn(yourTurn);
     setChanged();
     notifyObservers(board);
