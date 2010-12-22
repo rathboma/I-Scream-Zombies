@@ -276,7 +276,8 @@ public class GameController {
     JSONObject request = new JSONObject();
     try {
       request.put("name", name);
-      // TODO how do I add the AI?
+      // Set AI to true for now
+      request.put("ai", true);
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       String UUID = response.getString("uuid");
       gameModel.setUUID(UUID);
@@ -290,7 +291,7 @@ public class GameController {
    * 
    */
   public synchronized void getTurn(String UUID) {
-    String requestAddress = serverAddress + "turn/" + UUID;
+    String requestAddress = serverAddress + "get_turn/" + UUID;
     JSONObject response = sendGetRequestToServer(requestAddress);
     
     if (response.isNull("turn")) {
@@ -415,12 +416,13 @@ public class GameController {
    * @param y
    */
   public synchronized void makeMove(int x, int y) {
-    String requestAddress = serverAddress + "make_move/";
+    String requestAddress = serverAddress + "post_make_move/";
     JSONObject request = new JSONObject();
     try {
       request.put("uuid", gameModel.getUUID());
       request.put("x", x);
       request.put("y", y);
+      //JSONObject response = sendGetRequestToServer(requestAddress + request);
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       System.out.println("Moving to " + x + ", " + y + "...");
       System.out.println(response);

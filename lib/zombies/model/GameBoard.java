@@ -41,7 +41,7 @@ public class GameBoard {
    */
   public static class GameBoardBuilder {
     private final String UUID;
-    private Player you;
+    private Player you = new Player.PlayerBuilder(-1,-1).buildPlayer();
     private Player[] others;
     private Tile[][] tiles;
     private double[] cost;
@@ -250,6 +250,7 @@ public class GameBoard {
   }
   
   public int getHeight() {
+    if (tiles.length == 0) return 0;
     return tiles[0].length;
   }
 
