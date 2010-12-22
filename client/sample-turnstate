@@ -2,13 +2,7 @@
 	"x":55,
 	"y":55,
 	"customers":[
-		{
-			"id":22,
-			"favorite_type":"C,C,V",
-			"favorite_price":5,
-			"favorite_number":4
-		}
 	],
-	"zombies":null,
-	"store":false
+	"zombies":0,
+	"store":true
 }

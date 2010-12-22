@@ -123,7 +123,7 @@ module AIPlayer
 			elsif curr.customers.size > 0
 				sell_ice_cream(curr, @player.inventory)
 			elsif curr.store
-				buy_inventory
+				buy_inventory(@player.money)
 			elsif prev && (prev.zombies + prev.customers.size) > 0 && (curr.zombies + curr.customers.size) == 0
 				run_away
 			else
@@ -147,8 +147,8 @@ module AIPlayer
 			{:action => :run}
 		end
 
-		def buy_inventory
-			purchase = purchase_from_store()
+		def buy_inventory(money)
+			purchase = purchase_from_store(money)
 			{ :action => :buy				\
 			, :flavor => purchase.flavor	\
 			, :number => purchase.number	}
@@ -163,8 +163,8 @@ module AIPlayer
 			options.max{|i,j| i.score <=> j.score}
 		end
 
-		def purchase_from_store()
-			# TODO
+		def purchase_from_store(money)
+			Purchase.new(money, costs)
 		end
 	end
 
@@ -340,6 +340,18 @@ module AIPlayer
 			@price = best[:price]
 			best
 		end
+	end
+
+	class Purchase
+		attr_reader :flavor, :number, :unit_cost
+
+		def initialize(money, costs)
+			@flavor = ["C", "S", "V"][rand(3)]
+			@unit_cost = costs[@flavor]
+			@number = (money/@unit_cost).floor
+		end
+
+		def total_cost; @number*@cost end
 	end
 end
 
