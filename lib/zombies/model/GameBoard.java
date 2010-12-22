@@ -15,18 +15,24 @@ public class GameBoard {
   private boolean gameOver;
   private boolean win;
   
-  private GameBoard(String uUID, Player you, Player[] others, Tile[][] tiles, 
-      double[] cost, double[] basePrice, boolean yourTurn, boolean gameOver, 
-      boolean win) {
-    this.UUID = uUID;
-    this.you = you;
-    this.others = others;
-    this.tiles = tiles;
-    this.cost = cost;
-    this.basePrice = basePrice;
-    this.yourTurn = yourTurn;
-    this.gameOver = gameOver;
-    this.win = win;
+  private GameBoard(GameBoardBuilder builder) {
+    this.UUID = builder.UUID;
+    this.you = builder.you;
+    this.others = builder.others;
+    this.tiles = builder.tiles;
+    this.cost = builder.cost;
+    this.basePrice = builder.basePrice;
+    this.yourTurn = builder.yourTurn;
+    this.gameOver = builder.gameOver;
+    this.win = builder.win;
+  }
+  
+  public boolean inBounds(int x, int y) {
+    if (x < 0) return false;
+    if (y < 0) return false;
+    if (x > tiles.length - 1) return false;
+    if (y > tiles[x].length - 1) return false;
+    return true;
   }
   
   /**
@@ -149,8 +155,7 @@ public class GameBoard {
           }
         }
       }
-      return new GameBoard(UUID, you, others, tiles, cost, basePrice, yourTurn, 
-          gameOver, win);
+      return new GameBoard(this);
     }
   }
   
