@@ -426,7 +426,7 @@ public class GameController {
    * @param y
    */
   public synchronized void makeMove(int x, int y) {
-    String requestAddress = serverAddress + "make_move/";
+    String requestAddress = serverAddress + "post_make_move/";
     JSONObject request = new JSONObject();
     try {
       request.put("uuid", gameModel.getUUID());
