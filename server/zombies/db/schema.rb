@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(:version => 20101211190947) do
   add_index "customers", ["tile_id"], :name => "index_customers_on_tile_id"
 
   create_table "game_boards", :force => true do |t|
-    t.integer  "x"
-    t.integer  "y"
+    t.integer  "x",          :default => 0
+    t.integer  "y",          :default => 0
     t.integer  "game_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -50,18 +50,18 @@ ActiveRecord::Schema.define(:version => 20101211190947) do
     t.string   "uuid"
     t.integer  "x",               :default => 0
     t.integer  "y",               :default => 0
-    t.integer  "prev_x"
-    t.integer  "prev_y"
+    t.integer  "prev_x",          :default => 0
+    t.integer  "prev_y",          :default => 0
     t.float    "money",           :default => 0.0
     t.integer  "vanilla",         :default => 0
     t.integer  "chocolate",       :default => 0
     t.integer  "strawberry",      :default => 0
     t.integer  "kills",           :default => 0
     t.integer  "sales",           :default => 0
-    t.integer  "turns_remaining"
-    t.boolean  "turn"
-    t.boolean  "can_act"
-    t.boolean  "can_move"
+    t.integer  "turns_remaining", :default => 0
+    t.boolean  "turn",            :default => false
+    t.boolean  "can_act",         :default => false
+    t.boolean  "can_move",        :default => false
     t.integer  "game_id"
     t.datetime "created_at"
     t.datetime "updated_at"

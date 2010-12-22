@@ -1,8 +1,8 @@
 class CreateGameBoards < ActiveRecord::Migration
   def self.up
     create_table :game_boards do |t|
-      t.column :x, :int
-      t.column :y, :int
+      t.column :x, :int, :default => 0
+      t.column :y, :int, :default => 0
       t.column :game_id, :int
       t.timestamps
     end
