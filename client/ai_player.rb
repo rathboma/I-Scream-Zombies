@@ -159,7 +159,7 @@ module AIPlayer
 		end
 
 		def choose_best_sale(tile, inv)
-			options = tile.customers.collect{|c| c.find_sale(inv)} #TODO, collect option
+			options = tile.customers.collect{|c| c.find_sale(inv)}
 			options.max{|i,j| i.score <=> j.score}
 		end
 
