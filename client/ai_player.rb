@@ -15,7 +15,7 @@ module AIPlayer
 
 		def all_player_locations(include_self = true); include_self ? other_player_locations << player_location : other_player_locations end
 		def get_tile(location); @board.get_tile(location) end
-		def player_location; @player.location end
+		def player_tile; get_tile(@player.location) end
 		def other_player_locations; @others.map(&:location) end
 
 		def make_move!(gamestate)
@@ -72,18 +72,18 @@ module AIPlayer
 
 		def get_neighbors(group = :all)
 			if group == :unoccupied
-				player_location.neighbors_with_no_other_players
+				player_tile.neighbors_with_no_other_players
 			elsif group == :occupied
-				player_location.neighbors_with_other_players
+				player_tile.neighbors_with_other_players
 			elsif group == :all
-				player_location.neighbors
+				player_tile.neighbors
 			end
 		end
 
 		def make_dick_move(options)
 			move = nil
 			options.each do |o|
-			move = o if (o.zombies > 0 && o.customers.size == 0) || (o.zombies == 0 && o.customers.size > 0)
+				move = o if (o.zombies > 0 && o.customers.size == 0) || (o.zombies == 0 && o.customers.size > 0)
 			end
 			move
 		end
@@ -91,10 +91,11 @@ module AIPlayer
 		def move_towards_frontier
 			dist = nil
 			tile = nil
-			@board.tiles.collect do |t|
+			frontier = @board.tiles.collect do |t|
 				t.not_visible_neighbors
-			end.flatten.compact.uniq.each do |n| # Likely breaks if there is no frontier, but that requires every tile to have been explored
-				d = tile.distance_to(player_location)
+			end.flatten.compact.uniq
+			frontier.each do |n| # Likely breaks if there is no frontier, but that requires every tile to have been explored
+				d = player_tile.distance_to(tile)
 				if dist.nil? || d < dist
 					dist = d
 					tile = n
@@ -102,7 +103,7 @@ module AIPlayer
 			end
 			n_dist = nil
 			choice = nil
-			player_location.get_neighbors.each do |n|
+			player_tile.neighbors.each do |n|
 				nd = n.distance_to(tile)
 				if n_dist.nil? || nd < n_dist
 					n_dist = nd
@@ -159,7 +160,7 @@ module AIPlayer
 
 		def get_tile(loc)
 			if loc[:x] && loc[:y] && loc[:x] > 0 && loc[:x] < @dimensions[:x] && loc[:y] > 0 && loc[:y] < @dimensions[:y] # If in bounds
-				@tiles.select{|t| t.x == loc[:x] && t.y == loc[:y]}.first || Tile.new({:x => loc[:x], :y => loc[:y]}, @board, false)
+				@tiles.select{|t| t.x == loc[:x] && t.y == loc[:y]}.first || Tile.new({"x" => loc[:x], "y" => loc[:y]}, @board, false)
 			else
 				nil
 			end
@@ -180,8 +181,12 @@ module AIPlayer
 			@visible = visible
 			@x = hashdata["x"]
 			@y = hashdata["y"]
-			@zombies = hashdata["zombies"]
-			@customers = hashdata["customers"].map{|c| Customer.new(c, self)}
+			@zombies = hashdata["zombies"] || 0
+			@customers = if hashdata["customers"]
+				hashdata["customers"].collect{|c| Customer.new(c, self)}
+			else
+				[]
+			end
 			if hashdata["store"]
 				@board.add_store(self)
 				@store = true
@@ -193,6 +198,18 @@ module AIPlayer
 		def visible_neighbors; @board.visible_tiles_adjacent_to(self) end
 		def not_visible_neighbors; @board.not_visible_tiles_adjacent_to(self) end
 		def base_prices; @board.base_prices end
+
+		def distance_to(other)
+			if other.is_a? AIPlayer::Tile
+				(self.x - other.x).abs + (self.y - other.y).abs
+			elsif other
+				(self.x-other[:x]).abs + (self.y-other[:y]).abs
+			elsif other.nil?
+				1.0/0
+			else
+				{:error => "Not a valid tile, location hash, or nil object"}
+			end
+		end
 
 		def neighbors_with_other_players
 			other_player_locations = @board.other_player_locations
