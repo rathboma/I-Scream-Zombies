@@ -8,6 +8,8 @@ package zombies.model;
 public class Player {
   private final int x;
   private final int y;
+  private final int prevX;
+  private final int prevY;
   private final double score;
   private final double money;
   private final int[] inventory;
@@ -104,21 +106,35 @@ public class Player {
     return canMove;
   }
 
-  private Player(int x, int y, double score, double money, int[] inventory, 
-      int kills, int sales, int turns_remaining, boolean can_act, 
-      boolean can_move) {
-    this.x = x;
-    this.y = y;
-    this.score = score;
-    this.money = money;
-    this.inventory = inventory;
-    this.kills = kills;
-    this.sales = sales;
-    this.turnsRemaining = turns_remaining;
-    this.canAct = can_act;
-    this.canMove = can_move;
+  private Player(PlayerBuilder builder) {
+    this.x = builder.x;
+    this.y = builder.y;
+    this.prevX = builder.prevX;
+    this.prevY = builder.prevY;
+    this.score = builder.score;
+    this.money = builder.money;
+    this.inventory = builder.inventory;
+    this.kills = builder.kills;
+    this.sales = builder.sales;
+    this.turnsRemaining = builder.turnsRemaining;
+    this.canAct = builder.canAct;
+    this.canMove = builder.canMove;
   }
   
+  /**
+   * @return the prevX
+   */
+  public int getPrevX() {
+    return prevX;
+  }
+
+  /**
+   * @return the prevY
+   */
+  public int getPrevY() {
+    return prevY;
+  }
+
   /**
    * A builder object for the Player
    * @author Dan L. Dela Rosa
@@ -127,6 +143,8 @@ public class Player {
   public static class PlayerBuilder {
     private final int x;
     private final int y;
+    private int prevX;
+    private int prevY;
     private double score = 0;
     private double money = 0;
     private int[] inventory = new int[3];
@@ -144,6 +162,18 @@ public class Player {
     public PlayerBuilder(int x, int y) {
       this.x = x;
       this.y = y;
+      prevX = x;
+      prevY = y;
+    }
+    
+    public PlayerBuilder withPrevX(int prevX) {
+      this.prevX = prevX;
+      return this;
+    }
+    
+    public PlayerBuilder withPrevY(int prevY) {
+      this.prevY = prevY;
+      return this;
     }
     
     /**
@@ -163,6 +193,16 @@ public class Player {
      */
     public PlayerBuilder withMoney(double money) {
       this.money = money;
+      return this;
+    }
+    
+    public PlayerBuilder withKills(int kills) {
+      this.kills = kills;
+      return this;
+    }
+    
+    public PlayerBuilder withSales(int sales) {
+      this.sales = sales;
       return this;
     }
     
@@ -212,8 +252,7 @@ public class Player {
      * @return A new instance of Player
      */
     public Player buildPlayer() {
-      return new Player(x, y, score, money, inventory, kills, sales, 
-          turnsRemaining, canAct, canMove);
+      return new Player(this);
     }
   }
 }
