@@ -25,6 +25,8 @@ public class GameApplet extends Platform implements Observer {
   int bigMapWidth = 5;
   int bigMapHeight = 5;
   TileView[][] tiles = new TileView[bigMapWidth][bigMapHeight];
+  int[][] translateX = new int[bigMapWidth][bigMapHeight];
+  int[][] translateY = new int[bigMapWidth][bigMapHeight];
   String[][] tileLabels = new String[bigMapWidth][bigMapHeight];
   MiniTileView[][] miniTiles = new MiniTileView[0][0];
   Font font = new Font("Helvetica", Font.BOLD, 14);
@@ -66,6 +68,11 @@ public class GameApplet extends Platform implements Observer {
       }
     }
   }
+  
+  public void moveToTile(int x, int y) {
+    GameController controller = GameController.getInstance();
+    controller.makeMove(translateX[x][y], translateY[x][y]);
+  }
 
   public void update(Observable arg0, Object arg1) {
     if (!(arg1 instanceof GameBoard)) {
@@ -106,6 +113,8 @@ public class GameApplet extends Platform implements Observer {
     for (int x = 0; x < tiles.length; x++) {
       for (int y = 0; y < tiles[x].length; y++) {
         TileView tile = new TileView(x, y, this);
+        translateX[x][y] = x + board.getYou().getX() - 2;
+        translateY[x][y] = y + board.getYou().getY() - 2;
         int translateX = x + board.getYou().getX() - 2;
         int translateY = y + board.getYou().getY() - 2;
         tileLabels[x][y] = "(" + translateX + "," + translateY + ")";

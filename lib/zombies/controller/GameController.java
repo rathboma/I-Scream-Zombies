@@ -75,8 +75,9 @@ public class GameController {
       URL serverURL = new URL(requestAddress);
       HttpURLConnection connection = 
           (HttpURLConnection) serverURL.openConnection();
-      connection.connect();
       connection.setRequestMethod("POST");
+      connection.setDoOutput(true);
+      connection.connect();
       
       OutputStream out = connection.getOutputStream();
       Writer writer = new OutputStreamWriter(out, "UTF-8");
@@ -271,7 +272,7 @@ public class GameController {
    * @param name
    */
   public synchronized void joinGame(String name) {
-    String requestAddress = serverAddress + "/join_game";
+    String requestAddress = serverAddress + "join_game/";
     JSONObject request = new JSONObject();
     try {
       request.put("name", name);
@@ -309,6 +310,7 @@ public class GameController {
   public void getGameState(String UUID) {
     String requestAddress = serverAddress + "get_game_state/" + UUID;
     JSONObject response = sendGetRequestToServer(requestAddress);
+    System.out.println("Getting game state...");
     System.out.println(response);
     
     try {
@@ -382,27 +384,48 @@ public class GameController {
     }
   }
   
+  /**
+   * @param x
+   * @param y
+   * @param response
+   * @throws JSONException
+   */
+  private void handleCommonResponse(int x, int y, JSONObject response)
+          throws JSONException {
+    if(!response.isNull("error")) {
+      System.out.print(response.optString("error"));
+    }
+    else if (response.isNull("tile") || response.isNull("player")) {
+      System.out.println("Warning: missing information, aborting operation");
+    }
+    else {
+      JSONObject tileData = (JSONObject)response.get("tile");
+      Tile tile = processTile(tileData);
+      gameModel.updateTile(x, y, tile);
+      
+      JSONObject playerData = (JSONObject)response.get("player");
+      Player player = parsePlayerData(playerData);
+      gameModel.updatePlayer(player);
+    }
+  }
+  
+  /**
+   * 
+   * @param x
+   * @param y
+   */
   public synchronized void makeMove(int x, int y) {
-    String requestAddress = serverAddress + "/make_move";
+    String requestAddress = serverAddress + "make_move/";
     JSONObject request = new JSONObject();
     try {
       request.put("uuid", gameModel.getUUID());
       request.put("x", x);
       request.put("y", y);
       JSONObject response = sendPostRequestToServer(requestAddress, request);
+      System.out.println("Moving to " + x + ", " + y + "...");
+      System.out.println(response);
       
-      if(!response.isNull("error")) {
-        System.out.print(response.optString("error"));
-      }
-      else {
-        JSONObject tileData = (JSONObject)response.get("tile");
-        Tile tile = processTile(tileData);
-        gameModel.updateTile(x, y, tile);
-        
-        JSONObject playerData = (JSONObject)response.get("player");
-        Player player = parsePlayerData(playerData);
-        gameModel.updatePlayer(player);
-      }
+      handleCommonResponse(x, y, response);
     } 
     catch (Exception e) {
       System.out.println(e);
@@ -412,7 +435,7 @@ public class GameController {
   public synchronized void buy(int flavor, int number) {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
-    String requestAddress = serverAddress + "/make_move";
+    String requestAddress = serverAddress + "buy/";
     JSONObject request = new JSONObject();
     try {
       request.put("uuid", gameModel.getUUID());
@@ -420,18 +443,7 @@ public class GameController {
       request.put("number", number);
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       
-      if(!response.isNull("error")) {
-        System.out.print(response.optString("error"));
-      }
-      else {
-        JSONObject tileData = (JSONObject)response.get("tile");
-        Tile tile = processTile(tileData);
-        gameModel.updateTile(x, y, tile);
-        
-        JSONObject playerData = (JSONObject)response.get("player");
-        Player player = parsePlayerData(playerData);
-        gameModel.updatePlayer(player);
-      }
+      handleCommonResponse(x, y, response);
     } 
     catch (Exception e) {
       System.out.println(e);
@@ -441,7 +453,7 @@ public class GameController {
   public synchronized void sell(String flavors, int number, int customerId) {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
-    String requestAddress = serverAddress + "/make_move";
+    String requestAddress = serverAddress + "sell/";
     JSONObject request = new JSONObject();
     try {
       request.put("uuid", gameModel.getUUID());
@@ -450,18 +462,7 @@ public class GameController {
       request.put("customer_id", customerId);
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       
-      if(!response.isNull("error")) {
-        System.out.print(response.optString("error"));
-      }
-      else {
-        JSONObject tileData = (JSONObject)response.get("tile");
-        Tile tile = processTile(tileData);
-        gameModel.updateTile(x, y, tile);
-        
-        JSONObject playerData = (JSONObject)response.get("player");
-        Player player = parsePlayerData(playerData);
-        gameModel.updatePlayer(player);
-      }
+      handleCommonResponse(x, y, response);
     } 
     catch (Exception e) {
       System.out.println(e);
@@ -471,24 +472,13 @@ public class GameController {
   public synchronized void kill() {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
-    String requestAddress = serverAddress + "/make_move";
+    String requestAddress = serverAddress + "kill/";
     JSONObject request = new JSONObject();
     try {
       request.put("uuid", gameModel.getUUID());
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       
-      if(!response.isNull("error")) {
-        System.out.print(response.optString("error"));
-      }
-      else {
-        JSONObject tileData = (JSONObject)response.get("tile");
-        Tile tile = processTile(tileData);
-        gameModel.updateTile(x, y, tile);
-        
-        JSONObject playerData = (JSONObject)response.get("player");
-        Player player = parsePlayerData(playerData);
-        gameModel.updatePlayer(player);
-      }
+      handleCommonResponse(x, y, response);
     } 
     catch (Exception e) {
       System.out.println(e);
@@ -498,24 +488,13 @@ public class GameController {
   public synchronized void run() {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
-    String requestAddress = serverAddress + "/make_move";
+    String requestAddress = serverAddress + "run/";
     JSONObject request = new JSONObject();
     try {
       request.put("uuid", gameModel.getUUID());
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       
-      if(!response.isNull("error")) {
-        System.out.print(response.optString("error"));
-      }
-      else {
-        JSONObject tileData = (JSONObject)response.get("tile");
-        Tile tile = processTile(tileData);
-        gameModel.updateTile(x, y, tile);
-        
-        JSONObject playerData = (JSONObject)response.get("player");
-        Player player = parsePlayerData(playerData);
-        gameModel.updatePlayer(player);
-      }
+      handleCommonResponse(x, y, response);
     } 
     catch (Exception e) {
       System.out.println(e);
