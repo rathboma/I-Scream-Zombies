@@ -133,27 +133,27 @@ module AIPlayer
 
 		def kill_zombies
 			# TODO
-			:kill
+			{:action => :kill}
 		end
 
 		def sell_ice_cream
 			# TODO
-			:sell
+			{:action => :sell}
 		end
 
 		def run_away
 			# TODO
-			:run
+			{:action => :run}
 		end
 
 		def buy_inventory
 			# TODO
-			:buy
+			{:action => :buy}
 		end
 
 		def do_nothing
 			# TODO
-			:hold
+			{:action => :kill}
 		end
 	end
 
