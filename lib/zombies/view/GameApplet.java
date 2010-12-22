@@ -76,10 +76,13 @@ public class GameApplet extends Platform implements Observer {
   
   int refreshTimer = 0;
   
+  
+  
   /**
    * 
    */
   public void setup() {
+    model.addObserver(this);
     for(int x = 0; x < 5; x++) {
       for(int y = 0; y < 5; y++) {
         TileView tile = new TileView(x, y, this);
@@ -114,12 +117,22 @@ public class GameApplet extends Platform implements Observer {
    * 
    */
   public void update(){
-    if (refreshTimer < 300) {
-      refreshTimer++;
-    }
-    else {
-      controller.getTurn("NCQNWTPPJVBTLJSS");
-      refreshTimer = 0;
+    String uuid = model.getUUID();
+    if (uuid != "" && !model.isYourTurn()) {
+      if (refreshTimer < 300) {
+        refreshTimer++;
+      }
+      else {
+        System.out.println("Getting turn...");
+        controller.getTurn(uuid);
+        if (model.isYourTurn()) {
+          System.out.println("Yes! It's your turn!");
+        }
+        else {
+          System.out.println("It's not your turn yet...");
+        }
+        refreshTimer = 0;
+      }
     }
   }
   
@@ -154,12 +167,14 @@ public class GameApplet extends Platform implements Observer {
    * 
    */
   public void joinGame() {
-    model.addObserver(this);
-    model.setUUID("NCQNWTPPJVBTLJSS");
-    
-    controller.getGameState("NCQNWTPPJVBTLJSS");
-    
-    //controller.joinGame("Player 1");
+    if (model.getUUID() != "") {
+      System.out.println("Already in a game");
+      return;
+    }
+    controller.joinGame("Player 1");
+    String uuid = model.getUUID();
+    System.out.println("Joined game: " + uuid);
+    controller.getGameState(uuid);
   }
   
   /**

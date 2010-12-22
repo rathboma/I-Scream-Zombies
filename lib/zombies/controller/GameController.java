@@ -272,7 +272,7 @@ public class GameController {
    * @param name
    */
   public synchronized void joinGame(String name) {
-    String requestAddress = serverAddress + "join_game/";
+    String requestAddress = serverAddress + "join/";
     JSONObject request = new JSONObject();
     try {
       request.put("name", name);

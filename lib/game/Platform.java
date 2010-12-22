@@ -93,7 +93,9 @@ public class Platform extends BufferedApplet {
    }
 
 	public void removeThing(Thing thing){
-		things.remove(things.indexOf(thing));
+	  int removeIndex = things.indexOf(thing);
+	  if (removeIndex < 0) return;
+		things.remove(removeIndex);
 	}
 
    // HANDLE PLAYING AN AUDIO CLIP, WHETHER FROM A URL OR A LOCAL FILE
