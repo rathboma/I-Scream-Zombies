@@ -444,7 +444,7 @@ public class GameController {
   public synchronized void buy(int flavor, int number) {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
-    String requestAddress = serverAddress + "buy/";
+    String requestAddress = serverAddress + "buy";
     String request = "uuid=" + gameModel.getUUID();
 		request += "&flavor=" + flavor;
 		request += "&number=" + number;
@@ -461,7 +461,7 @@ public class GameController {
   public synchronized void sell(String flavors, int number, int customerId) {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
-    String requestAddress = serverAddress + "sell/";
+    String requestAddress = serverAddress + "sell";
 
     String request = "uuid=" + gameModel.getUUID();
 		request += "&flavors=" + flavors;
@@ -480,7 +480,7 @@ public class GameController {
   public synchronized void kill() {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
-    String requestAddress = serverAddress + "kill/";
+    String requestAddress = serverAddress + "kill";
     String request = "uuid=" + gameModel.getUUID();
     try {
       JSONObject response = sendPostRequestToServer(requestAddress, request);
@@ -495,7 +495,7 @@ public class GameController {
   public synchronized void run() {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
-    String requestAddress = serverAddress + "run/";
+    String requestAddress = serverAddress + "run";
     String request = "uuid=" + gameModel.getUUID();
     try {
       JSONObject response = sendPostRequestToServer(requestAddress, request);
