@@ -69,7 +69,7 @@ public class GameController {
    * @param requestAddress
    */
   private JSONObject sendPostRequestToServer(String requestAddress, 
-      JSONObject object) {
+      String data) {
     String response = "";
     try {
       URL serverURL = new URL(requestAddress);
@@ -81,7 +81,7 @@ public class GameController {
       
       OutputStream out = connection.getOutputStream();
       Writer writer = new OutputStreamWriter(out, "UTF-8");
-      writer.write(object.toString());
+      writer.write(data);
       writer.flush();
       writer.close();
       
@@ -274,11 +274,9 @@ public class GameController {
   public synchronized void joinGame(String name) {
     System.out.println("Finding a game for you...");
     String requestAddress = serverAddress + "join/";
-    JSONObject request = new JSONObject();
+    String request = "name=" + name;
     try {
-      request.put("name", name);
       // Set AI to true for now
-      request.put("ai", true);
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       String UUID = response.getString("uuid");
       gameModel.setUUID(UUID);
@@ -426,12 +424,12 @@ public class GameController {
    * @param y
    */
   public synchronized void makeMove(int x, int y) {
-    String requestAddress = serverAddress + "post_make_move/";
-    JSONObject request = new JSONObject();
+    String requestAddress = serverAddress + "move";
+    String request = "";
     try {
-      request.put("uuid", gameModel.getUUID());
-      request.put("x", x);
-      request.put("y", y);
+			request += "uuid=" + gameModel.getUUID();
+			request += "&x=" + x;
+			request += "&y=" + y;
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       System.out.println("Moving to " + x + ", " + y + "...");
       System.out.println(response);
@@ -447,11 +445,10 @@ public class GameController {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
     String requestAddress = serverAddress + "buy/";
-    JSONObject request = new JSONObject();
+    String request = "uuid=" + gameModel.getUUID();
+		request += "&flavor=" + flavor;
+		request += "&number=" + number;
     try {
-      request.put("uuid", gameModel.getUUID());
-      request.put("flavor", flavor);
-      request.put("number", number);
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       
       handleCommonResponse(x, y, response);
@@ -465,12 +462,12 @@ public class GameController {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
     String requestAddress = serverAddress + "sell/";
-    JSONObject request = new JSONObject();
+
+    String request = "uuid=" + gameModel.getUUID();
+		request += "&flavors=" + flavors;
+		request += "&number=" + number;
+		request += "&customer_id=" + customerId;
     try {
-      request.put("uuid", gameModel.getUUID());
-      request.put("flavors", flavors);
-      request.put("number", number);
-      request.put("customer_id", customerId);
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       
       handleCommonResponse(x, y, response);
@@ -484,9 +481,8 @@ public class GameController {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
     String requestAddress = serverAddress + "kill/";
-    JSONObject request = new JSONObject();
+    String request = "uuid=" + gameModel.getUUID();
     try {
-      request.put("uuid", gameModel.getUUID());
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       
       handleCommonResponse(x, y, response);
@@ -500,9 +496,8 @@ public class GameController {
     int x = gameModel.getPlayerX();
     int y = gameModel.getPlayerY();
     String requestAddress = serverAddress + "run/";
-    JSONObject request = new JSONObject();
+    String request = "uuid=" + gameModel.getUUID();
     try {
-      request.put("uuid", gameModel.getUUID());
       JSONObject response = sendPostRequestToServer(requestAddress, request);
       
       handleCommonResponse(x, y, response);
