@@ -11,7 +11,7 @@ public class Thing
 	platform.removeThing(this);
 	_removed = true;
 	}
-  boolean isStatic = false;
+  boolean isStatic = true;
    public void setPlatform(Platform platform) {
       this.platform = platform;
    }

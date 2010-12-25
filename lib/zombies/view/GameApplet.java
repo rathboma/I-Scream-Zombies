@@ -3,8 +3,14 @@ package zombies.view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.imageio.ImageIO;
 
 import zombies.controller.GameController;
 import zombies.model.Flavors;
@@ -13,6 +19,7 @@ import zombies.model.GameModel;
 import zombies.model.Player;
 import zombies.model.Tile;
 
+import game.PhotoThing;
 import game.Platform;
 import game.RectThing;
 import game.Thing;
@@ -77,6 +84,9 @@ public class GameApplet extends Platform implements Observer {
   
   int refreshTimer = 0;
   
+  Thing titleScreen = new PhotoThing(imageHelper("media/images/title.jpg"), 
+      0, 0, 800, 600);
+  
   /**
    * 
    */
@@ -97,9 +107,6 @@ public class GameApplet extends Platform implements Observer {
     minimap.setColor(Color.WHITE);
     addThing(minimap);
     
-    joinButton.setColor(Color.WHITE);
-    addThing(joinButton);
-    
     buyButton.setColor(Color.LIGHT_GRAY);
     addThing(buyButton);
     
@@ -111,6 +118,41 @@ public class GameApplet extends Platform implements Observer {
     
     runButton.setColor(Color.LIGHT_GRAY);
     addThing(runButton);
+    
+    addThing(titleScreen);
+    
+    joinButton.setColor(Color.WHITE);
+    addThing(joinButton);
+  }
+  
+  /**
+   * 
+   * @param fileName
+   * @return
+   */
+  Image imageHelper(String fileName) {
+    BufferedImage img = null;
+    try {
+        img = ImageIO.read(new File(fileName));
+    } catch (IOException e) {
+      System.out.println(e);
+    }
+    return img;
+    /*
+     * Code below doesn't work because getDocumentBase() returns null for 
+     * some reason...
+     */
+    /* 
+    try {
+      BufferedImage img;
+      URL url = new URL(getDocumentBase(), fileName);
+      img = ImageIO.read(url);
+      return img;
+    } catch (IOException e) {
+      System.out.println(e);
+      return null;
+    }
+    */
   }
   
   /**
@@ -170,6 +212,7 @@ public class GameApplet extends Platform implements Observer {
     System.out.println("Joined game: " + uuid);
     controller.getGameState(uuid);
     joinButton.setColor(Color.LIGHT_GRAY);
+    removeThing(titleScreen);
   }
   
   /**
