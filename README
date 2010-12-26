@@ -1,1 +1,35 @@
 Santa isn't real. Zombies are.
+
+
+
+
+
+Workflow for a game:
+
+while not players turn:
+	display 'waiting for other player', or 'waiting for another player to join'
+
+when players turn (move)
+	-> show tiles the player can move to (highlight)
+	-> click a tile, player moves to that tile (should be obvious the player has moved.)
+
+when player's turn (action)
+	-> sidebar should show zombies and customers with their favorite flavor + number they will buy
+		- for sale, user clicks a customer, then a sub-screen pops up and asks for what to sell (select items from a list)
+		- for kill, it just reduces the number of zombies
+	
+	-> for buy
+		- user can buy quantityxflavor multiple times
+		(need a finish_purchase method)
+		
+
+java workflow
+
+	on move / action -> the player & the player's tile are returned. These can be merged into the game_state.
+	
+	
+	
+	
+	
+	
+		
