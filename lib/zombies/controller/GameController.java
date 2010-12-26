@@ -275,6 +275,9 @@ public class GameController {
     System.out.println("Finding a game for you...");
     String requestAddress = serverAddress + "join/";
     String request = "name=" + name;
+
+		//for when debugging the server adds you as both players
+		request += "&debug=true";
     try {
       // Set AI to true for now
       JSONObject response = sendPostRequestToServer(requestAddress, request);
