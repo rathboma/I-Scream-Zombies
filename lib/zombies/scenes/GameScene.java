@@ -39,7 +39,32 @@ public class GameScene implements IScene{
 
 		public void update(){
 			try{
-				if(engine.myTurn()){	
+				/*
+					for each tile do
+						if tile.clicked
+							tile.unclick
+							display_tile_information_in_sidebar
+				
+				*/
+				
+				if(engine.myTurn()){
+					/*
+						if canMove()
+							ensure current view == move_view
+							if (playerMoved) // decided by a keypress event
+								engine.doMove()
+					
+						else if canAct()
+							ensure current_view = action_view (has buttons for stuff)
+							for each action_button do
+								if kill -> engine.kill()
+								if sell -> validate selection (loop through each ice-cream selection button and see which are clicked)
+								if buy -> validate purchase, engine.buy!
+						
+						end
+					
+					*/
+					
 					System.out.println("its my turn!");
 				}				
 				
