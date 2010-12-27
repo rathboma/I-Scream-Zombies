@@ -64,12 +64,16 @@ Actions
 			}
 				or
 			error (if uuid is unmatched)
-	Post Make_move (uuid, x, y)
-		returns {
+	Post move (uuid, x, y)
+		returns tile, player
+		
+		format:
+		{
 					:tile = {
 						:customers = [{}, {}, {}], #see above
 						:zombies = int,
 						:store = boolean,
+						x, y
 					},
 					:player = #player
 				}

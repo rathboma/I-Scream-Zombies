@@ -10,15 +10,11 @@ import javax.sound.sampled.*;
 import java.io.*;
 import java.net.*;
 
-
-
 public class Platform extends BufferedApplet {
-	public static boolean DEBUGGING = false;
    int w = 0, h = 0;
    Color bgColor = Color.white;
    Thing selectedThing = null;
    ArrayList things = new ArrayList();
-   public static Platform platform;
 
    // GET THE iTH THING IN THIS PLATFORM
    public Thing thing(int i) { return ((Thing)things.get(i)); }
@@ -41,7 +37,7 @@ public class Platform extends BufferedApplet {
 
    public boolean mouseDrag(Event e, int x, int y) {
       damage = true;
-      if (selectedThing != null && selectedThing.movable)
+      if (selectedThing != null)
          selectedThing.mouseDrag(x, y);
       return false;
    }
@@ -97,8 +93,9 @@ public class Platform extends BufferedApplet {
    }
 
 	public void removeThing(Thing thing){
-		
-		if(things.indexOf(thing) != -1) things.remove(things.indexOf(thing));
+	  int removeIndex = things.indexOf(thing);
+	  if (removeIndex < 0) return;
+		things.remove(removeIndex);
 	}
 
    // HANDLE PLAYING AN AUDIO CLIP, WHETHER FROM A URL OR A LOCAL FILE
@@ -123,20 +120,6 @@ public class Platform extends BufferedApplet {
    public int stringWidth(String s, Graphics g) {
       return g.getFontMetrics(g.getFont()).stringWidth(s);
    }
-
-	public URL getBase(){
-
-		if(Platform.DEBUGGING) return getCodeBase();
-		return getDocumentBase();
-	}
-
-
-//STATIC
-   public static int getStringWidth(String s, Graphics g) {
-      return g.getFontMetrics(g.getFont()).stringWidth(s);
-   }
-
-
 
 }
 
