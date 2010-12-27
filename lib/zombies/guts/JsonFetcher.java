@@ -12,32 +12,45 @@ public class JsonFetcher{
 		this.debug = debugging;
 	}
 	
-	public String join(String name){
+	public String join(String name) throws GameServerException {
 		String args = "name=" + name;
 		if(debug) args += "&debug=true";
 		JSONObject result = post("join", args);
 		try{
+			validate(result);
 			return result.getString("uuid");
-		}catch(JSONException ex){}
-		
-		return null;
+		}catch(JSONException ex){
+			throw new GameServerException("problems with the server, response: " + result.toString());
+		}
 	}
 	
-	public JSONObject getBoard(){
+	public JSONObject getBoard() throws GameServerException {
 		String args = defaultArgs();
-		return get("get_game_state/" + uuid, null);
+		JSONObject result = get("get_game_state/" + uuid, null);
+		validate(result);
+		return result;
+	}
+	
+	public JSONObject getTurn() throws GameServerException{
+		String args = defaultArgs();
+		JSONObject result = get("get_turn/" + uuid, null);
+		validate(result);
+		return result;
 	}
 	
 	
 	
 	
+	private void validate(JSONObject obj) throws GameServerException {
+		if(obj.has("error")) throw GameServerException.fromJson(obj);
+	}
 	
 	
 	private String defaultArgs(){
 		return "uuid=" + uuid;
 	}
 	
-	private JSONObject post(String path, String args){
+	public JSONObject post(String path, String args){
 		
     try {
       URL server = new URL(root + path);
@@ -65,7 +78,7 @@ public class JsonFetcher{
 	}
 	
 	
-	private JSONObject get(String path, String args){
+	public JSONObject get(String path, String args){
 		JSONObject result;
     try {
 			String all = root + path;

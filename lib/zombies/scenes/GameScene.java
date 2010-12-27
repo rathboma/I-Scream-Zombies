@@ -7,18 +7,24 @@ import zombies.*;
 import zombies.guts.*;
 public class GameScene implements IScene{
 	
-	GameData game;
+
 	GameEngine engine;
+	String error;
 	IScene mChild = null, mParent = null;
+	long nextTurnCheck = 0;
 	public GameScene(GameEngine engine){
 		this.engine = engine;
 	}
 	
 	public void setup(){
-		if(!engine.started()){
-			engine.startGame("test_player");
+		try{
+			if(!engine.started()){
+				engine.startGame("test_player");
+			}
+		}catch(GameServerException ex){
+			System.out.println(ex);
+			this.error = ex.getMessage();
 		}
-		game = engine.getGameData();
 	}
 
 	public void addChild(IScene child){
@@ -32,6 +38,17 @@ public class GameScene implements IScene{
 
 
 		public void update(){
+			try{
+				if(engine.myTurn()){	
+					System.out.println("its my turn!");
+				}				
+				
+			}catch(GameServerException ex){
+				System.err.println(ex);
+			}
+			
+			
+			
 			//dont have to call update on the things, that's done by the platform
 			//TODO: Update shape positions if needed
 		}

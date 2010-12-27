@@ -13,5 +13,17 @@ public class GameData {
 	
 	
 	
+	public boolean myTurn() throws GameServerException{
+		try{
+			return mData.getJSONObject("players").getJSONObject("you").getBoolean("turn");
+		}catch(JSONException ex){
+			throw new GameServerException(ex);
+		}
+	}
+	
+	
+	private void extract(JSONObject data){
+		
+	}
 	
 }
