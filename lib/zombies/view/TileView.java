@@ -6,7 +6,6 @@ import game.*;
 
 /**
  * "Zoomed in" view of a tile
- * TODO extends RectThing
  * @author Dan L. Dela Rosa
  */
 public class TileView extends RectThing {
