@@ -41,73 +41,101 @@ public class GameApplet extends Platform implements Observer {
   MiniTileView[][] miniTiles = new MiniTileView[0][0];
   Font font = new Font("Helvetica", Font.BOLD, 14);
   
+  Thing background = new PhotoThing(imageHelper("media/images/background.png"), 
+      0, 0, 800, 600);
+  
+  Thing titleScreen = new PhotoThing(imageHelper("media/images/title.jpg"), 
+      0, 0, 800, 600);
+      
+  Thing tutorial = new PhotoThing(
+      imageHelper("media/images/instructions.png"), 0, 0, 800, 600) {
+    public boolean mouseDown(int x, int y) {
+      removeThing(tutorial);
+      return false;
+    }
+  };
+  
+  Thing tutorialButton = new PhotoThing(
+      imageHelper("media/images/buttons/button_instructions.png"), 
+      320, 370, 122, 27) {
+    public boolean mouseDown(int x, int y) {
+      addThing(tutorial);
+      return false;
+    }
+  };
+  
   Thing joinButton = new PhotoThing(
-      imageHelper("media/images/buttons/Button_newgame.png"),
-      300, 320, 150, 100) {
+      imageHelper("media/images/buttons/button_startgame.png"),
+      320, 340, 122, 27) {
     public boolean mouseDown(int x, int y) {
       joinGame();
+      removeThing(joinButton);
+      removeThing(titleScreen);
+      removeThing(tutorialButton);
       return false;
    }
   };
   
-  Thing buyButton = new RectThing(50, 420, 40, 20) {
+  Thing buyButton = new PhotoThing(
+      imageHelper("media/images/buttons/button_buy.png"),
+      470, 270, 61, 27) {
     public boolean mouseDown(int x, int y) {
       controller.buy(0, 0);
       return false;
    }
   };
   
-  Thing sellButton = new RectThing(100, 420, 40, 20) {
+  Thing sellButton = new PhotoThing(
+      imageHelper("media/images/buttons/button_sell.png"),
+      470, 300, 61, 27) {
     public boolean mouseDown(int x, int y) {
       controller.sell("", 0, 0);
       return false;
    }
   };
   
-  Thing killButton = new RectThing(150, 420, 40, 20) {
+  Thing killButton = new PhotoThing(
+      imageHelper("media/images/buttons/button_kill.png"),
+      470, 330, 61, 27) {
     public boolean mouseDown(int x, int y) {
       controller.kill();
       return false;
    }
   };
   
-  Thing runButton = new RectThing(200, 420, 40, 20) {
+  Thing runButton = new PhotoThing(
+      imageHelper("media/images/buttons/button_run.png"),
+      470, 360, 61, 27) {
     public boolean mouseDown(int x, int y) {
       controller.run();
       return false;
    }
   };
   
+  Thing mapButton = new PhotoThing(
+      imageHelper("media/images/buttons/button_map.png"),
+      470, 390, 61, 27) {
+    public boolean mouseDown(int x, int y) {
+      return false;
+    }
+  };
+  
   String playerLabel1 = "";
   String playerLabel2 = "";
+  String playerLabel3 = "";
+  String playerLabel4 = "";
+  String playerLabel5 = "";
   
   GameModel model = GameModel.getInstance();
   GameController controller = GameController.getInstance();
   
   int refreshTimer = 0;
   
-  Thing titleScreen = new PhotoThing(imageHelper("media/images/title.jpg"), 
-      0, 0, 800, 600);
-  
-  Thing tutorial = new PhotoThing(
-      imageHelper("media/images/instructions.png"), 0, 0, 800, 600) {
-    public boolean mouseDown(int x, int y) {
-      removeThing(tutorial);
-      return false;
-   }
-  };
-  Thing tutorialButton = new PhotoThing(
-      imageHelper("media/images/buttons/go-button-trans.gif"), 0, 0, 42, 41) {
-    public boolean mouseDown(int x, int y) {
-      addThing(tutorial);
-      return false;
-   }
-  };
-  
   /**
    * 
    */
   public void setup() {
+    addThing(background);
     model.addObserver(this);
     for(int x = 0; x < 5; x++) {
       for(int y = 0; y < 5; y++) {
@@ -120,27 +148,19 @@ public class GameApplet extends Platform implements Observer {
         addThing(miniTile);
       }
     }
+    
     minimap.makeStatic();
     minimap.setColor(Color.WHITE);
     addThing(minimap);
     
-    buyButton.setColor(Color.LIGHT_GRAY);
     addThing(buyButton);
-    
-    sellButton.setColor(Color.LIGHT_GRAY);
     addThing(sellButton);
-    
-    killButton.setColor(Color.LIGHT_GRAY);
     addThing(killButton);
-    
-    runButton.setColor(Color.LIGHT_GRAY);
     addThing(runButton);
+    addThing(mapButton);
     
     addThing(titleScreen);
-    
-    joinButton.setColor(Color.WHITE);
     addThing(joinButton);
-    
     addThing(tutorialButton);
   }
   
@@ -204,16 +224,11 @@ public class GameApplet extends Platform implements Observer {
         g.drawString(tileLabels2[x][y], placeX, placeY + 20);
       }
     }
-    g.drawString("Buy", (int)buyButton.getX() + 5, 
-            (int)buyButton.getY() + 15);
-    g.drawString("Sell", (int)sellButton.getX() + 5, 
-            (int)sellButton.getY() + 15);
-    g.drawString("Kill", (int)killButton.getX() + 5, 
-            (int)killButton.getY() + 15);
-    g.drawString("Run", (int)runButton.getX() + 5, 
-            (int)runButton.getY() + 15);
-    g.drawString(playerLabel1, 10, 460);
-    g.drawString(playerLabel2, 10, 480);
+    g.drawString(playerLabel1, 420, 180);
+    g.drawString(playerLabel2, 420, 200);
+    g.drawString(playerLabel3, 420, 220);
+    g.drawString(playerLabel4, 420, 240);
+    g.drawString(playerLabel5, 420, 260);
   }
   
   /**
@@ -228,9 +243,6 @@ public class GameApplet extends Platform implements Observer {
     String uuid = model.getUUID();
     System.out.println("Joined game: " + uuid);
     controller.getGameState(uuid);
-    joinButton.setColor(Color.LIGHT_GRAY);
-    removeThing(joinButton);
-    removeThing(titleScreen);
   }
   
   /**
@@ -309,13 +321,20 @@ public class GameApplet extends Platform implements Observer {
     }
     Player yourPlayer = board.getYou();
     StringBuilder playerLabelBuilder = new StringBuilder();
+    playerLabelBuilder.append("Player: " + model.getUUID());
+    playerLabel1 = playerLabelBuilder.toString();
+    playerLabelBuilder = new StringBuilder();
     playerLabelBuilder.append("Money: " + yourPlayer.getMoney());
     playerLabelBuilder.append(" ");
+    playerLabel2 = playerLabelBuilder.toString();
+    playerLabelBuilder = new StringBuilder();
     playerLabelBuilder.append("Sales: " + yourPlayer.getSales());
     playerLabelBuilder.append(" ");
+    playerLabel3 = playerLabelBuilder.toString();
+    playerLabelBuilder = new StringBuilder();
     playerLabelBuilder.append("Zombie Kills: " + yourPlayer.getKills());
     playerLabelBuilder.append(" ");
-    playerLabel1 = playerLabelBuilder.toString();
+    playerLabel4 = playerLabelBuilder.toString();
     playerLabelBuilder = new StringBuilder();
     playerLabelBuilder.append("C: " 
             + yourPlayer.getInstancesOf(Flavors.CHOCOLATE));
@@ -326,20 +345,6 @@ public class GameApplet extends Platform implements Observer {
     playerLabelBuilder.append("V: " 
             + yourPlayer.getInstancesOf(Flavors.VANILLA));
     playerLabelBuilder.append(" ");
-    playerLabel2 = playerLabelBuilder.toString();
-    
-    // Show whether it is your turn
-    if (!board.isYourTurn()) {
-      buyButton.setColor(Color.LIGHT_GRAY);
-      sellButton.setColor(Color.LIGHT_GRAY);
-      killButton.setColor(Color.LIGHT_GRAY);
-      runButton.setColor(Color.LIGHT_GRAY);
-    }
-    else {
-      buyButton.setColor(Color.WHITE);
-      sellButton.setColor(Color.WHITE);
-      killButton.setColor(Color.WHITE);
-      runButton.setColor(Color.WHITE);
-    }
+    playerLabel5 = playerLabelBuilder.toString();
   }
 }
