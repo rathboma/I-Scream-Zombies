@@ -1,0 +1,10 @@
+When you start the game, you will automatically log in into a new game session.
+During the game, players take turns performing actions on the map.
+At the beginning of your turn, you may move to adjacent space, revealing its contents.
+Afterwards, you may perform one of the following actions:
+-Buy ice cream if there is a store at your current tile.
+-Sell ice cream to a customer if there are no zombies around.
+-Kill a zombie.
+-Run back to your previous space.
+Selling ice cream and killing zombies contribute to your score.
+The game ends after a certain number of turns. The player with the highest score wins.

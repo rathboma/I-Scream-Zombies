@@ -41,7 +41,9 @@ public class GameApplet extends Platform implements Observer {
   MiniTileView[][] miniTiles = new MiniTileView[0][0];
   Font font = new Font("Helvetica", Font.BOLD, 14);
   
-  Thing joinButton = new RectThing(0, 420, 40, 20) {
+  Thing joinButton = new PhotoThing(
+      imageHelper("media/images/buttons/Button_newgame.png"),
+      300, 320, 150, 100) {
     public boolean mouseDown(int x, int y) {
       joinGame();
       return false;
@@ -87,6 +89,21 @@ public class GameApplet extends Platform implements Observer {
   Thing titleScreen = new PhotoThing(imageHelper("media/images/title.jpg"), 
       0, 0, 800, 600);
   
+  Thing tutorial = new PhotoThing(
+      imageHelper("media/images/instructions.png"), 0, 0, 800, 600) {
+    public boolean mouseDown(int x, int y) {
+      removeThing(tutorial);
+      return false;
+   }
+  };
+  Thing tutorialButton = new PhotoThing(
+      imageHelper("media/images/buttons/go-button-trans.gif"), 0, 0, 42, 41) {
+    public boolean mouseDown(int x, int y) {
+      addThing(tutorial);
+      return false;
+   }
+  };
+  
   /**
    * 
    */
@@ -123,6 +140,8 @@ public class GameApplet extends Platform implements Observer {
     
     joinButton.setColor(Color.WHITE);
     addThing(joinButton);
+    
+    addThing(tutorialButton);
   }
   
   /**
@@ -185,8 +204,6 @@ public class GameApplet extends Platform implements Observer {
         g.drawString(tileLabels2[x][y], placeX, placeY + 20);
       }
     }
-    g.drawString("Join", (int)joinButton.getX() + 5, 
-        (int)joinButton.getY() + 15);
     g.drawString("Buy", (int)buyButton.getX() + 5, 
             (int)buyButton.getY() + 15);
     g.drawString("Sell", (int)sellButton.getX() + 5, 
@@ -212,6 +229,7 @@ public class GameApplet extends Platform implements Observer {
     System.out.println("Joined game: " + uuid);
     controller.getGameState(uuid);
     joinButton.setColor(Color.LIGHT_GRAY);
+    removeThing(joinButton);
     removeThing(titleScreen);
   }
   
