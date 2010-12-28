@@ -47,6 +47,21 @@ public class JsonFetcher{
 		validate(result);
 		return result;
 	}
+	public JSONObject postKill() throws GameServerException{
+		String args = defaultArgs();
+		JSONObject result = post("kill", args);
+		validate(result);
+		return result;
+	}
+	public JSONObject postSell(int id, String flavor) throws GameServerException{
+		String args = defaultArgs();
+		args += "&customer_id=" + id;
+		args += "&number=" + 1;
+		args += "&flavors=" + flavor;
+		JSONObject result = post("sell", args);
+		validate(result);
+		return result;
+	}
 	
 	
 	

@@ -7,7 +7,7 @@ import zombies.*;
 import org.json.*;
 public class GameEngine {
 
-	GameData data = null;
+	Game data = null;
 	JsonFetcher fetcher;
 	String uuid;
 	long nextRefresh = 0;
@@ -23,21 +23,32 @@ public class GameEngine {
 		updateData();
 		
 	}
-	public GameData getGameData() {
-		return this.data;
-	}
 	
 	public Game updateData() throws GameServerException{
 		try{
 			long now = (new Date()).getTime();
 			if(nextRefresh <= now){
 				nextRefresh = now + 1000 * 5; //five seconds
-				data = new GameData(fetcher.getBoard());
+				data = (new GameData(fetcher.getBoard())).toGame();
 			}
-			return data.toGame();
+			return data;
 		}catch(Exception ex){
 			throw new GameServerException(ex);
 		}
+	}
+	
+	long turnCheck = 0;
+	
+	public boolean checkForTurn() throws GameServerException{
+		long now = (new Date()).getTime();
+		if(turnCheck <= now){
+			turnCheck = now + 5000;
+			JSONObject result = fetcher.getTurn();
+			try{
+				return result.getBoolean("turn");
+			}catch(JSONException ex){throw new GameServerException(ex);}
+		}
+		else return data.player.isTurn();
 	}
 	
 	
@@ -48,6 +59,23 @@ public class GameEngine {
 			return update;
 		}catch(JSONException ex){throw new GameServerException(ex);}
 	}
+	public ActionUpdate postKill() throws GameServerException{
+		try{
+			JSONObject result = fetcher.postKill();
+			ActionUpdate update = ActionUpdate.fromJSON(result);
+			return update;
+		}catch(JSONException ex){throw new GameServerException(ex);}
+		
+	}
+	public ActionUpdate postSell(int id, String flavor) throws GameServerException{
+		try{
+			JSONObject result = fetcher.postSell(id, flavor);
+			ActionUpdate update = ActionUpdate.fromJSON(result);
+			return update;
+		}catch(JSONException ex){throw new GameServerException(ex);}
+		
+	}
+
 	
 	
 	/*

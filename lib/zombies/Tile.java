@@ -8,31 +8,54 @@ public class Tile extends RectThing{
 	public boolean revealed = false;
 	public boolean store = false;
 	public Customer[] customers;
-	public int zombies;
+	public int zombies = 0;
 	public boolean clicked = false;
-	public static int width = 45, height = 45;
+	public static int width = 20, height = 20;
+	private static DiskThing p1, p2;
 	public int tileX, tileY;
 	
-	public static void visualize(double startX, double startY, Tile[][] tiles, Coordinate player){
-		//going to display 7 by 7, with the player in the middle. If player closer than 7 to the edge, don't move.
+	public static void visualize(Tile[][] tiles, Coordinate player){
+		double startX = 5,  startY = 5;
+		
 		removeAllTilesFromPlatform(tiles);
-		int sx = player.x - 3;
-		if (sx < 0) sx = 0;
-		if(player.x + 3 > tiles.length) sx = tiles.length - 4;
-		
-		int sy = player.y - 3;
-		if (sy < 0) sy = 0;
-		if(player.y + 3 > tiles[0].length) sy = tiles[0].length - 4; // always subtract 1 anyway.
-		
-		for(int x = sx; x < sx + 7; x++){
-			for(int y = sy; y < sy + 7; y++){
+		Platform.platform.removeThing(p1);
+		Platform.platform.removeThing(p2);
+		p1 = null;
+		p2 = null;
+		for(int x = 0; x < tiles.length; x++){
+			for(int y = 0; y < tiles[x].length; y++){
 				Tile tile = tiles[x][y];
-				Platform.platform.addThing(tile);
-				tile.setX(startX + (x-sx)*(Tile.width + 2));
-				tile.setY(startY + (y-sy)*(Tile.height + 2));
 				tile.updateVisuals();
+				Platform.platform.addThing(tile);
+				tile.setX(startX + getX(x));
+				tile.setY(startY + getY(y));
 			}
 		}
+		
+		
+	}
+	private static int getX(int x){
+		return x*(Tile.width + 2);
+	}
+	private static int getY(int y){
+		return y*(Tile.height + 2);
+	}
+	
+	public static void showPlayers(Coordinate player1, Coordinate player2 ){
+		if(p1 == null) {
+			p1 = new DiskThing(0, 0, 10, 10);
+			p1.setColor(Color.green);			
+			Platform.platform.addThing(p1);
+			}
+		if(p2 == null){
+			p2 = new DiskThing(0, 0, 10, 10);
+			p2.setColor(Color.red);			
+			Platform.platform.addThing(p2);
+		}		
+		p1.setX(getX(player1.x) + 10);
+		p1.setY(getY(player1.y) + 10);
+		p2.setX(getX(player2.x) + 15);
+		p2.setY(getY(player2.y) + 15);
 	}
 	
 	public static Tile selected(Tile[][] tiles){
@@ -63,7 +86,7 @@ public class Tile extends RectThing{
 	}
 	
 	
-	private static void removeAllTilesFromPlatform(Tile[][] tiles){
+	public static void removeAllTilesFromPlatform(Tile[][] tiles){
 		for(int x = 0; x < tiles.length; x++)
 			for(int y = 0; y < tiles[x].length; y++)
 				Platform.platform.removeThing(tiles[x][y]);
@@ -72,6 +95,7 @@ public class Tile extends RectThing{
 	public Tile(){
 		super(0, 0, Tile.width, Tile.height);
 		this.movable = false;
+		customers = new Customer[0];
 	}
 	public Tile(int x, int y){
 		this();

@@ -6,7 +6,7 @@ import java.awt.image.*;
 
 public class MenuThing extends StaticRect{
 	Color mTextColor = Color.blue; // change me!!
-	int mFontSize = 40;
+	protected int mFontSize = 40;
 	boolean mClicked = false;
 	String mText;
 	Image mImage = null;

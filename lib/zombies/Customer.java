@@ -4,15 +4,18 @@ import org.json.*;
 public class Customer{
 	
 	public int id;
-	public String[] willBuy = new String[]{"V", "C", "S", ""};
-	public double[] purchasePrices = new double[]{1.5, 4, 4.5, 0};
-	public int[] number = new int[]{1, 1, 1, 1};
+	public String favoriteType;
+	public double favoritePrice;
+	public int favoriteNum;
 	
 	public static Customer fromJSON(JSONObject j) throws JSONException{
 		Customer result = new Customer();
-		result.willBuy[3] = j.getString("favorite_type");
-		result.purchasePrices[3] = j.getDouble("favorite_price");
-		result.number[3] = j.getInt("favorite_number");
+		result.id = j.getInt("id");
+		result.favoriteType = j.getString("favorite_type");
+		result.favoritePrice = j.getDouble("favorite_price");
+		result.favoriteNum = j.getInt("favorite_number");
+		
+		result.favoriteNum = 1; //only one for the minute.
 		return result;
 	}
 	

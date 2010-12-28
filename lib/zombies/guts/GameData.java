@@ -28,6 +28,13 @@ public class GameData {
 	public Game toGame() throws JSONException, GameServerException{
 		Game g = new Game();
 		g.player = Player.fromJSON(mPlayer);
+		g.chocolatePrice = mData.getJSONObject("prices").getDouble("C");
+		g.strawberryPrice = mData.getJSONObject("prices").getDouble("S");
+		g.vanillaPrice = mData.getJSONObject("prices").getDouble("V");
+		
+		g.vanillaCost = mData.getJSONObject("costs").getInt("V");
+		g.chocolateCost = mData.getJSONObject("costs").getInt("C");
+		g.strawberryCost = mData.getJSONObject("costs").getInt("S");		
 		g.tiles = getTiles();
 		if( mOthers.length() > 0) g.other = Player.basicFromJSON(mOthers.getJSONObject(0));
 		return g;
