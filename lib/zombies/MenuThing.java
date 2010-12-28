@@ -29,8 +29,8 @@ public class MenuThing extends StaticRect{
 		mTopY = centerY - height/2.0;
 		mWidth = width;
 		mHeight = height;
-		this.setColor(Color.red);
-		this.setLineColor(Color.red);		
+		this.setColor(Color.gray);
+		this.setLineColor(Color.gray);		
 	}
 
 	public MenuThing(double cX, double cY, double w, double h, String t){
@@ -40,7 +40,7 @@ public class MenuThing extends StaticRect{
 	}
 
 	public MenuThing(double centerX, double centerY, String text){
-		this(centerX, centerY, 150, 70, text);
+		this(centerX, centerY, 100, 55, text);
 		mText = text;
 	}
 

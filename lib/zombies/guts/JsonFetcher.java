@@ -1,10 +1,12 @@
 package zombies.guts;
+import zombies.*;
 import org.json.*;
 import java.io.*;
 import java.net.*;
 
 public class JsonFetcher{
-	String root = "http://iscreamzombies.heroku.com/";
+	//String root = "http://iscreamzombies.heroku.com/";
+	String root = "http://localhost:3000/";
 	boolean debug;
 	public String uuid;
 	
@@ -25,15 +27,23 @@ public class JsonFetcher{
 	}
 	
 	public JSONObject getBoard() throws GameServerException {
-		String args = defaultArgs();
 		JSONObject result = get("get_game_state/" + uuid, null);
 		validate(result);
 		return result;
 	}
 	
 	public JSONObject getTurn() throws GameServerException{
-		String args = defaultArgs();
 		JSONObject result = get("get_turn/" + uuid, null);
+		validate(result);
+		return result;
+	}
+	
+	public JSONObject postMove(Coordinate to) throws GameServerException{
+		String args = defaultArgs();
+		args += "&x=" + to.x;
+		args += "&y=" + to.y;
+		JSONObject result = post("move", args);
+		System.out.println("posted move: " + result.toString());
 		validate(result);
 		return result;
 	}
@@ -42,6 +52,8 @@ public class JsonFetcher{
 	
 	
 	private void validate(JSONObject obj) throws GameServerException {
+		//System.out.println("uuid : " + uuid + ", validating : " + obj.toString());
+		
 		if(obj.has("error")) throw GameServerException.fromJson(obj);
 	}
 	

@@ -8,7 +8,7 @@ public class Thing {
    public int width;
    public int height;
    public boolean held = false;
-   protected boolean movable = false; //dont change in this class.
+   public boolean movable = false; //dont change in this class.
    protected Color color = Color.black;
 	protected boolean mPolygon = true;
    protected Color lineColor = Color.black;

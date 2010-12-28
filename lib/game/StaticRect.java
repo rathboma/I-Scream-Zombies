@@ -6,7 +6,7 @@ import zombies.*;
 public class StaticRect extends ImageThing {
       protected double _Width;
       protected double _Height;
-
+			
       public StaticRect(String path, double x, double y, double width, double height) {
             super(path, (int) width, (int) height, (int) x, (int) y);
             this.x = x + width / 2;

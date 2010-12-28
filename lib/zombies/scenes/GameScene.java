@@ -6,25 +6,38 @@ import game.*;
 import zombies.*;
 import zombies.guts.*;
 public class GameScene implements IScene{
-	
-
 	GameEngine engine;
 	String error;
 	IScene mChild = null, mParent = null;
-	long nextTurnCheck = 0;
+
+	Game state;
+	SideArea sideArea;
+	RectThing bottomPanel;
+	public Coordinate activeTile = null;
+
+	
 	public GameScene(GameEngine engine){
 		this.engine = engine;
 	}
 	
 	public void setup(){
+		this.sideArea = new SideArea(this);
+		bottomPanel = new RectThing(0, Platform.platform.getHeight() - 40, Platform.platform.getWidth(), 40);
+		bottomPanel.setColor(Color.white);
+		Platform.platform.addThing(bottomPanel);
 		try{
 			if(!engine.started()){
 				engine.startGame("test_player");
+				state = engine.updateData();
+				Tile.visualize(0, 0, state.tiles, state.player.coordinates);
 			}
 		}catch(GameServerException ex){
 			System.out.println(ex);
 			this.error = ex.getMessage();
 		}
+	}
+	private void refreshTiles(){
+
 	}
 
 	public void addChild(IScene child){
@@ -33,6 +46,7 @@ public class GameScene implements IScene{
 
 	//This is the simplest implementation of a finish method.
 	public void finish(){
+		Platform.platform.removeThing(bottomPanel);
 		//Platform.platform.removeThing(mBackground);
 	}
 
@@ -46,8 +60,13 @@ public class GameScene implements IScene{
 							display_tile_information_in_sidebar
 				
 				*/
-				
-				if(engine.myTurn()){
+				//state = engine.updateData();
+				Tile t = Tile.selected(state.tiles);
+				sideArea.updateSideArea(t, state);
+				sideArea.update();
+				handleUserEvents();
+
+					
 					/*
 						if canMove()
 							ensure current view == move_view
@@ -65,8 +84,7 @@ public class GameScene implements IScene{
 					
 					*/
 					
-					System.out.println("its my turn!");
-				}				
+
 				
 			}catch(GameServerException ex){
 				System.err.println(ex);
@@ -78,9 +96,59 @@ public class GameScene implements IScene{
 			//TODO: Update shape positions if needed
 		}
 
-		public void updateOverlay(Graphics g){
-			//nothing
+		private void handleUserEvents() throws GameServerException{
+			if(sideArea.moveAttempted()){
+				System.out.println("move attempted!");
+				try{
+					ActionUpdate update = engine.moveTo(activeTile);
+					state.mergeUpdate(update);
+					Tile.visualize(0, 0, state.tiles, state.player.coordinates);
+				}catch(GameServerException e){
+					sideArea.setError(e.getMessage());
+				}
+				
+			}else if(sideArea.killAttempted()){
+				
+			}else if(sideArea.sellAttempted()){
+				
+			}else if(sideArea.buyAttempted()){
+				
+			}else{}
+			
 		}
+		
+		private void displayActiveTile(){
+		}
+
+		public void updateOverlay(Graphics g){
+			sideArea.updateOverlay(g);
+			renderPlayerInfo(g);
+		}
+		
+		private void renderPlayerInfo(Graphics g){
+			Font oldFont = g.getFont();
+			g.setFont(new Font("Helvetica", Font.PLAIN, 14));
+			
+			String[] playerData = new String[11];
+			playerData[0] = "YOU:";
+			playerData[1] = "Money: " + state.player.money;
+			playerData[2] = "Kills: " + state.player.kills;
+			playerData[3] = "Sales: " + state.player.sales;				
+			playerData[4] = "V: " + state.player.vanilla + " C: " + state.player.chocolate + " S: " + state.player.strawberry;
+			playerData[5] = "turns remaining: " + state.player.turnsRemaining;
+			playerData[6] = "";
+			playerData[7] = "OPPONENT:";
+			playerData[8] = "Money: " + state.other.money;
+			playerData[9] = "Kills: " + state.other.kills;
+			playerData[10] = "Sales: " + state.other.sales;
+			String drawMe = "";
+			for(int i = 0; i < playerData.length; i++){
+				drawMe += playerData[i] + " ";
+			}
+			g.drawString(drawMe, 10, Platform.platform.getHeight() - 20);
+			g.setFont(oldFont);
+		}
+		
 
 		public boolean childReady(){
 			//some condition

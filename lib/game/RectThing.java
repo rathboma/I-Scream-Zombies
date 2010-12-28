@@ -1,5 +1,5 @@
 package game;
-
+import zombies.*;
 // A RECTANGLE SHAPED THING
 
 public class RectThing extends Thing
@@ -21,7 +21,7 @@ public class RectThing extends Thing
    }
 
 	public Coordinate topLeft(){
-		Coordinate result = new Coordinate(X[0], Y[0]);
+		Coordinate result = new Coordinate((int)X[0], (int)Y[0]);
 		return result;
 	}
 }
