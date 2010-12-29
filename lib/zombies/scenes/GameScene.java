@@ -10,6 +10,7 @@ public class GameScene implements IScene{
 	String error;
 	IScene mChild = null, mParent = null;
 	public int buttonStart = 300;
+	String bigMessage = "";
 
 	Game state;
 	SideArea sideArea;
@@ -68,6 +69,7 @@ public class GameScene implements IScene{
 		public void update(){
 			try{
 				if(!state.player.isTurn()){
+					bigMessage = "Waiting for the other player...";
 					if(engine.checkForTurn()) updateState();
 				}
 				
@@ -181,6 +183,10 @@ public class GameScene implements IScene{
 		}
 
 		public void updateOverlay(Graphics g){
+			Font oldFont = g.getFont();
+			g.setFont(new Font("Helvetica", Font.PLAIN, 30));		
+			g.drawString(bigMessage, Platform.platform.getWidth()/2 - (Platform.platform.stringWidth(bigMessage, g) / 2), Platform.platform.getHeight()/2 - 15);
+			g.setFont(oldFont);
 			sideArea.updateOverlay(g);
 			renderPlayerInfo(g);
 			for(int i = 0; i < iceButtons.size(); i++)

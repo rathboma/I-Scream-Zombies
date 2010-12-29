@@ -37,6 +37,10 @@ public class GameData {
 		g.strawberryCost = mData.getJSONObject("costs").getInt("S");		
 		g.tiles = getTiles();
 		if( mOthers.length() > 0) g.other = Player.basicFromJSON(mOthers.getJSONObject(0));
+		else{
+			g.other = new Player();
+			g.other.coordinates = g.player.coordinates.copy();
+		} 
 		return g;
 	}
 	
