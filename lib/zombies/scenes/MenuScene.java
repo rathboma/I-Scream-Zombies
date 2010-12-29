@@ -9,7 +9,9 @@ public class MenuScene implements IScene{
 	IScene mParent = null;
 	ArrayList mButtons;
 	ImageThing mBackground;
-	MenuThing mStart;
+	MenuThing start;
+	MenuThing ai;
+	static boolean useAi = false;
 	String title = "I SCREAM ZOMBIES";
 	Font mFont;
 
@@ -57,11 +59,13 @@ public class MenuScene implements IScene{
 
 	public boolean childReady(){
 		//some condition
-		return mStart.clicked();
+		return start.clicked() || ai.clicked();
 	}
 
 	public IScene getChild(){
-		mStart.unClick();
+		if(ai.clicked()) MenuScene.useAi = true;
+		start.unClick();
+		ai.unClick();
 		return mChild;
 	}
 	
@@ -87,9 +91,13 @@ public class MenuScene implements IScene{
 	private void initializeButtons(){
 		System.out.println("adding buttons");
 		Image image = Platform.platform.getImage(Platform.platform.getBase(), "Button_newgame.png");
-		MenuThing start = new MenuThing(Platform.platform.getWidth() / 2.0, 300, 150, 100, image);
+		start = new MenuThing(Platform.platform.getWidth() / 2.0, 300, 150, 100, image);
+		image = Platform.platform.getImage(Platform.platform.getBase(), "ai_game.png");
+		ai = new MenuThing(Platform.platform.getWidth() / 2.0, 425, 61, 27, image);
+		
 		Platform.platform.addThing(start);
+		Platform.platform.addThing(ai);
 		mButtons.add(start);
-		mStart = start;
+		mButtons.add(ai);
 	}
 }

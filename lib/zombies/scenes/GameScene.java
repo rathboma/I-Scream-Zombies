@@ -31,6 +31,7 @@ public class GameScene implements IScene{
 	}
 	
 	public void setup(){
+		engine.useAi = MenuScene.useAi;
 		this.sideArea = new SideArea(this);
 		initializeBackground();
 		bottomPanel = new RectThing(0, Platform.platform.getHeight() - 40, Platform.platform.getWidth(), 40);

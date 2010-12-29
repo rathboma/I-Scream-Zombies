@@ -11,6 +11,7 @@ public class GameEngine {
 	JsonFetcher fetcher;
 	String uuid;
 	long nextRefresh = 0;
+	public boolean useAi = false;
 	public GameEngine(boolean debug){
 		fetcher = new JsonFetcher(debug);
 	}
@@ -18,7 +19,7 @@ public class GameEngine {
 		return data != null;
 	}
 	public void startGame(String name) throws GameServerException {
-		uuid = fetcher.join(name);
+		uuid = fetcher.join(name, useAi);
 		fetcher.uuid = uuid;
 		updateData();
 		

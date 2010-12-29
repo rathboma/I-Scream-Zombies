@@ -14,8 +14,9 @@ public class JsonFetcher{
 		this.debug = debugging;
 	}
 	
-	public String join(String name) throws GameServerException {
+	public String join(String name, boolean ai) throws GameServerException {
 		String args = "name=" + name;
+		if(ai) args += "&ai=true";
 		if(debug) args += "&debug=true";
 		JSONObject result = post("join", args);
 		try{
