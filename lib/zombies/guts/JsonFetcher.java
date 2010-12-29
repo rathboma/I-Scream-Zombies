@@ -62,6 +62,14 @@ public class JsonFetcher{
 		validate(result);
 		return result;
 	}
+	public JSONObject postBuy(String flavor, int num) throws GameServerException{
+		String args = defaultArgs();
+		args += "&number=" + num;
+		args += "&flavor=" + flavor;
+		JSONObject result = post("buy", args);
+		validate(result);
+		return result;
+	}
 	
 	
 	

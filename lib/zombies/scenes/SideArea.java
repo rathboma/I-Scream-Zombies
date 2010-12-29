@@ -71,10 +71,11 @@ public class SideArea{
 	
 	public void updateOverlay(Graphics g){
 		Font oldFont = g.getFont();
-		g.setFont(new Font("Helvetica", Font.PLAIN, 14));
 		
+		g.setFont(new Font("Helvetica", Font.PLAIN, 28));
 		for(int i = 0; i < messages.length; i++){
-			g.drawString(messages[i], background.topLeft().x + 5, 10 + (i*15));
+			int theX = Platform.platform.getWidth()/2 - (Platform.platform.stringWidth(messages[i], g)/2);
+			g.drawString(messages[i], theX, 10 + (i*30));
 		}
 		g.setFont(new Font("Helvetica", Font.PLAIN, 22));		
 		int nextString = 60;
@@ -86,22 +87,12 @@ public class SideArea{
 		Tile selected = Tile.highlighted;
 		g.drawString("zombies: " + selected.zombies, background.topLeft().x + 5, nextString);
 		nextString += 15;
-		// String[] customerText = new String[1 + (selected.customers.length > 0 ? 3 : 0) + selected.customers.length];
-		// customerText[0] = "Customers on this tile will buy:";
-		// if(selected.customers.length > 0){
-		// 	customerText[1] = "1x V for " + state.vanillaPrice;
-		// 	customerText[2] = "1x C for " + state.chocolatePrice;
-		// 	customerText[3] = "1x S for " + state.strawberryPrice;			
-		// }
-		// for(int i = 0; i < selected.customers.length; i++){
-		// 	int ij = 4 + i;
-		// 	customerText[ij] = "1x " + selected.customers[i].favoriteType + " for " + selected.customers[i].favoritePrice;
-		// }
-		// 
-		// for(int i = 0; i < customerText.length; i++){
-		// 	g.drawString(customerText[i], background.topLeft().x + 5, nextString);
-		// 	nextString += 15;
-		// }
+		
+		if(Tile.highlighted.store){
+			g.drawString("you can buy:", background.topLeft().x + 5, master.buttonStart - 20);			
+		}else{
+			g.drawString("you can sell: (via " + selected.customers.length + " customers)", background.topLeft().x + 5, master.buttonStart - 20);
+		}
 		
 		
 		

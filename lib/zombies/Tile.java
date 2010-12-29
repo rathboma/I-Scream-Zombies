@@ -95,6 +95,7 @@ public class Tile extends RectThing{
 		customers = other.customers;
 		zombies = other.zombies;
 		store = other.store;
+		revealed = other.revealed;
 	}
 	
 	public void updateVisuals(){
@@ -104,11 +105,23 @@ public class Tile extends RectThing{
 	public boolean mouseDown(int x, int y) {
 		clicked = true;
 		System.out.println("tile clicked: " + tileX + ", " + tileY + " zombies: " + zombies + " customers: " + customers.length);
+		select();
+    return super.mouseDown(x, y);
+  }
+
+	public void select(){
+		if(IceCreamButton.highlighted != null) IceCreamButton.highlighted.unSelect();
 		if(Tile.highlighted != null) Tile.highlighted.updateVisuals();
 		Tile.highlighted = this;
 		highlight();
-    return super.mouseDown(x, y);
-  }
+	}
+	
+	public boolean contains(int customer){
+		for(int i = 0; i < customers.length; i++){
+			if(customers[i].id == customer) return true;
+		}
+		return false;
+	}
 
 	public void highlight(){
 		this.setColor(Color.lightGray);

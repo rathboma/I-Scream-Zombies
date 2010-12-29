@@ -75,6 +75,14 @@ public class GameEngine {
 		}catch(JSONException ex){throw new GameServerException(ex);}
 		
 	}
+	public ActionUpdate postBuy(String flavor, int number) throws GameServerException{
+		try{
+			JSONObject result = fetcher.postBuy(flavor, number);
+			ActionUpdate update = ActionUpdate.fromJSON(result);
+			return update;
+		}catch(JSONException ex){throw new GameServerException(ex);}
+		
+	}
 
 	
 	

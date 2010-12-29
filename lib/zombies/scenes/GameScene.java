@@ -12,7 +12,7 @@ public class GameScene implements IScene{
 	public int buttonStart = 300;
 	String bigMessage = "";
 
-	Game state;
+	public Game state;
 	SideArea sideArea;
 	RectThing bottomPanel;
 	Tile lastHighlighted = null;
@@ -29,7 +29,7 @@ public class GameScene implements IScene{
 		bottomPanel = new RectThing(0, Platform.platform.getHeight() - 40, Platform.platform.getWidth(), 40);
 		bottomPanel.setColor(Color.white);
 		for(int i = 0; i < 8; i++){
-			IceCreamButton b = new IceCreamButton();
+			IceCreamButton b = new IceCreamButton(this);
 			iceButtons.add(b); //shouldn't be more than 6 things to sell...
 			b.setX(sideArea.background.topLeft().x + 5 + 100);
 			b.setY(buttonStart + i*20);
@@ -62,6 +62,7 @@ public class GameScene implements IScene{
 		try{
 			if(state != null) Tile.removeAllTilesFromPlatform(state.tiles);
 			state = engine.updateData();
+			if(IceCreamButton.highlighted != null) IceCreamButton.highlighted.unSelect();
 			Tile.visualize(state.tiles, state.player.coordinates);
 		}catch(GameServerException ex){sideArea.setError(ex.getMessage());}
 	}
@@ -85,12 +86,11 @@ public class GameScene implements IScene{
 				//state = engine.updateData();
 
 
-				if(Tile.highlighted == null) {
-					Tile.highlighted = state.playerTile();
-					Tile.highlighted.highlight();
-					}
+				if(Tile.highlighted == null) state.playerTile().select();
 				sideArea.updateSideArea(state);
-				displayPurchases();
+				
+				if(Tile.highlighted.store) displayStoreButtons();
+				else displayPurchases();
 				handleUserEvents();
 				Tile.showPlayers(state.player.coordinates, state.other.coordinates);
 					
@@ -136,12 +136,26 @@ public class GameScene implements IScene{
 				else if(i == 2) b.updateText("S", state.strawberryPrice, t.customers[0].id);
 				else{
 					int ij = i - 3;
-
 					b.updateText(t.customers[ij].favoriteType, t.customers[ij].favoritePrice, t.customers[ij].id);
 				}
 			}
 			
-			for(int i = max; i < 6; i++){
+			for(int i = max; i < iceButtons.size(); i++){
+				IceCreamButton b = (IceCreamButton)iceButtons.get(i);
+				Platform.platform.removeThing(b);
+			}
+		}
+		
+		private void displayStoreButtons(){
+			Tile t = Tile.highlighted;
+			for(int i = 0; i < 3; i++){
+				IceCreamButton b = (IceCreamButton)iceButtons.get(i);
+				Platform.platform.addThing(b);
+				if(i == 0) b.updateText("V", state.vanillaCost, -1);
+				if(i == 1) b.updateText("C", state.chocolateCost, -1);
+				if(i == 2)b.updateText("S", state.strawberryCost, -1);
+			}
+			for(int i = 3; i < iceButtons.size(); i++){
 				IceCreamButton b = (IceCreamButton)iceButtons.get(i);
 				Platform.platform.removeThing(b);
 			}
@@ -176,7 +190,12 @@ public class GameScene implements IScene{
 				}
 				
 			}else if(sideArea.buyAttempted()){
-				
+				try{					
+					ActionUpdate update = engine.postBuy(IceCreamButton.highlighted.flavor, IceCreamButton.highlighted.clickCount);
+					state.mergeUpdate(update);
+				}catch(GameServerException e){
+					sideArea.setError(e.getMessage());
+				}	
 			}else{}
 			
 		}
