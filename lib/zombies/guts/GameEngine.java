@@ -52,9 +52,9 @@ public class GameEngine {
 	}
 	
 	
-	public ActionUpdate moveTo(Coordinate p) throws GameServerException{
+	public ActionUpdate moveTo(Tile p) throws GameServerException{
 		try{
-			JSONObject result = fetcher.postMove(p);
+			JSONObject result = fetcher.postMove(p.tileX, p.tileY);
 			ActionUpdate update = ActionUpdate.fromJSON(result);
 			return update;
 		}catch(JSONException ex){throw new GameServerException(ex);}

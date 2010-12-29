@@ -92,13 +92,17 @@ public class Platform extends BufferedApplet {
 
    // ADD AN ALREADY EXISTING THING TO THIS PLATFORM
    public void addThing(Thing thing) {
-      things.add(thing);
+      if(things.indexOf(thing) == -1) things.add(thing); //only add once.
       thing.setPlatform(this);
    }
 
 	public void removeThing(Thing thing){
 		
 		if(things.indexOf(thing) != -1) things.remove(things.indexOf(thing));
+	}
+	
+	public boolean containsThing(Thing thing){
+		return things.indexOf(thing) != -1;
 	}
 
    // HANDLE PLAYING AN AUDIO CLIP, WHETHER FROM A URL OR A LOCAL FILE

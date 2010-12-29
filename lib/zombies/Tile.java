@@ -13,7 +13,7 @@ public class Tile extends RectThing{
 	public static int width = 20, height = 20;
 	private static DiskThing p1, p2;
 	public int tileX, tileY;
-	
+	public static Tile highlighted = null;
 	public static void visualize(Tile[][] tiles, Coordinate player){
 		double startX = 5,  startY = 5;
 		
@@ -58,18 +58,6 @@ public class Tile extends RectThing{
 		p2.setY(getY(player2.y) + 15);
 	}
 	
-	public static Tile selected(Tile[][] tiles){
-		for(int x = 0; x < tiles.length; x++)
-			for(int y = 0; y < tiles[x].length; y++){
-				Tile t = tiles[x][y];
-				if(t.clicked){
-					t.clicked = false;
-					return t;
-				}
-			}
-			return null;
-	}
-	
 	public static Tile fromJSON(JSONObject obj) throws JSONException{
 		Tile result = new Tile();
 		result.revealed = true;
@@ -103,20 +91,27 @@ public class Tile extends RectThing{
 		this.tileY = y;
 	}
 	
+	public void merge(Tile other){
+		customers = other.customers;
+		zombies = other.zombies;
+		store = other.store;
+	}
+	
 	public void updateVisuals(){
 		this.setColor(revealed ? (store ? Color.yellow : Color.green) : Color.darkGray );
 	}
 	
 	public boolean mouseDown(int x, int y) {
 		clicked = true;
+		System.out.println("tile clicked: " + tileX + ", " + tileY + " zombies: " + zombies + " customers: " + customers.length);
+		if(Tile.highlighted != null) Tile.highlighted.updateVisuals();
+		Tile.highlighted = this;
+		highlight();
     return super.mouseDown(x, y);
   }
 
 	public void highlight(){
 		this.setColor(Color.lightGray);
-	}
-	public void unHighlight(){
-		updateVisuals();
 	}
   
 	

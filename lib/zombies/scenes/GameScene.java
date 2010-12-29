@@ -9,14 +9,15 @@ public class GameScene implements IScene{
 	GameEngine engine;
 	String error;
 	IScene mChild = null, mParent = null;
+	public int buttonStart = 300;
 
 	Game state;
 	SideArea sideArea;
 	RectThing bottomPanel;
-	public Coordinate activeTile = null;
+	Tile lastHighlighted = null;
 	
 	int maxCustomers = 3;
-	ArrayList forPurchase = new ArrayList();
+	ArrayList iceButtons = new ArrayList();
 	
 	public GameScene(GameEngine engine){
 		this.engine = engine;
@@ -26,7 +27,12 @@ public class GameScene implements IScene{
 		this.sideArea = new SideArea(this);
 		bottomPanel = new RectThing(0, Platform.platform.getHeight() - 40, Platform.platform.getWidth(), 40);
 		bottomPanel.setColor(Color.white);
-		
+		for(int i = 0; i < 6; i++){
+			IceCreamButton b = new IceCreamButton();
+			iceButtons.add(b); //shouldn't be more than 6 things to sell...
+			b.setX(sideArea.background.topLeft().x + 5 + 100);
+			b.setY(buttonStart + i*20);
+		}
 		
 		Platform.platform.addThing(bottomPanel);
 		try{
@@ -74,9 +80,12 @@ public class GameScene implements IScene{
 				*/
 				//state = engine.updateData();
 
-				Tile t = Tile.selected(state.tiles);
-				sideArea.updateSideArea(t, state);
-				sideArea.update();
+
+				if(Tile.highlighted == null) {
+					Tile.highlighted = state.playerTile();
+					Tile.highlighted.highlight();
+					}
+				sideArea.updateSideArea(state);
 				displayPurchases();
 				handleUserEvents();
 				Tile.showPlayers(state.player.coordinates, state.other.coordinates);
@@ -111,43 +120,27 @@ public class GameScene implements IScene{
 		}
 		
 		private void displayPurchases(){
-			Tile t = state.tiles[activeTile.x][activeTile.y];
-			int baseNum = t.customers.length > 0 ? 3 : 0;
-			int total = t.customers.length + baseNum;
+			Tile t = Tile.highlighted;			
+			int max = 0;
+			if(Tile.highlighted.customers.length > 0) max = 3 + Tile.highlighted.customers.length;
 			
-			//forPurchase > total
-			for(int i = 0; i < forPurchase.size(); i++){
-				if(i >= total){
-					Platform.platform.removeThing((Thing)forPurchase.get(i));
-					forPurchase.remove(i);					
+			for(int i = 0; i < max; i++){
+				IceCreamButton b = (IceCreamButton)iceButtons.get(i);
+				Platform.platform.addThing(b);
+				if(i == 0) b.updateText("V", state.vanillaPrice, t.customers[0].id);
+				else if(i == 1) b.updateText("C", state.chocolatePrice, t.customers[0].id);
+				else if(i == 2) b.updateText("S", state.strawberryPrice, t.customers[0].id);
+				else{
+					int ij = i - 3;
+
+					b.updateText(t.customers[ij].favoriteType, t.customers[ij].favoritePrice, t.customers[ij].id);
 				}
 			}
-			//total > forPurchase
-			int diff = total - forPurchase.size();
-			for(int i = 0; i < diff; i++){
-				IceCreamButton b = new IceCreamButton();
-				forPurchase.add(b);
-				Platform.platform.addThing(b);
-			}
-			//now we have the right number of buttons.
-			if(baseNum > 0){
-				((IceCreamButton)forPurchase.get(0)).updateText("V", state.vanillaPrice, t.customers[0].id);
-				((IceCreamButton)forPurchase.get(1)).updateText("C", state.chocolatePrice, t.customers[0].id);
-				((IceCreamButton)forPurchase.get(2)).updateText("S", state.strawberryPrice, t.customers[0].id);
-			}
 			
-			for(int i = 3; i < forPurchase.size(); i++){
-				int ij = i - 3;
-				IceCreamButton b = (IceCreamButton)forPurchase.get(i);
-				b.updateText(t.customers[ij].favoriteType, t.customers[ij].favoritePrice, t.customers[ij].id);
+			for(int i = max; i < 6; i++){
+				IceCreamButton b = (IceCreamButton)iceButtons.get(i);
+				Platform.platform.removeThing(b);
 			}
-			for(int i = 0; i < forPurchase.size(); i++)
-				{
-					IceCreamButton b = ((IceCreamButton)forPurchase.get(i));
-					b.setX(sideArea.background.topLeft().x + 5 + 100);
-					b.setY(300 + 20*i);
-					b.update();
-					}
 		}
 
 
@@ -156,7 +149,7 @@ public class GameScene implements IScene{
 			if(sideArea.moveAttempted()){
 				System.out.println("move attempted!");
 				try{
-					ActionUpdate update = engine.moveTo(activeTile);
+					ActionUpdate update = engine.moveTo(Tile.highlighted);
 					state.mergeUpdate(update);
 				}catch(GameServerException e){
 					sideArea.setError(e.getMessage());
@@ -190,8 +183,8 @@ public class GameScene implements IScene{
 		public void updateOverlay(Graphics g){
 			sideArea.updateOverlay(g);
 			renderPlayerInfo(g);
-			for(int i = 0; i < forPurchase.size(); i++)
-				((IceCreamButton)forPurchase.get(i)).updateOverlay(g);
+			for(int i = 0; i < iceButtons.size(); i++)
+				((IceCreamButton)iceButtons.get(i)).updateOverlay(g);
 		}
 		
 		private void renderPlayerInfo(Graphics g){

@@ -38,10 +38,10 @@ public class JsonFetcher{
 		return result;
 	}
 	
-	public JSONObject postMove(Coordinate to) throws GameServerException{
+	public JSONObject postMove(int x, int y) throws GameServerException{
 		String args = defaultArgs();
-		args += "&x=" + to.x;
-		args += "&y=" + to.y;
+		args += "&x=" + x;
+		args += "&y=" + y;
 		JSONObject result = post("move", args);
 		System.out.println("posted move: " + result.toString());
 		validate(result);

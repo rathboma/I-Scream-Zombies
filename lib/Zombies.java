@@ -15,7 +15,7 @@ public class Zombies extends Platform {
 			Platform.platform = this;
 		
 			MenuScene menu = new MenuScene();		
-			GameScene game = new GameScene(new GameEngine(true));
+			GameScene game = new GameScene(new GameEngine(true)); //TRUE = single player, debug mode
 			menu.addChild(game);
 			mManager = new SceneManager(menu);
 		}

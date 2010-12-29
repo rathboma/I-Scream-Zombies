@@ -13,10 +13,13 @@ public class Game{
 	public int vanillaCost;
 	public int strawberryCost;
 	
+	public Tile playerTile(){
+		return tiles[player.coordinates.x][player.coordinates.y];
+	}
+	
+	
 	public void mergeUpdate(ActionUpdate update){
 		player = update.player;
-		Platform.platform.removeThing(tiles[update.revealed.tileX][update.revealed.tileY]);
-		tiles[update.revealed.tileX][update.revealed.tileY] = update.revealed;
-		Tile.visualize(tiles, player.coordinates);
+		tiles[update.revealed.tileX][update.revealed.tileY].merge(update.revealed);
 	}
 }
