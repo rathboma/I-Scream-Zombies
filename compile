@@ -2,3 +2,4 @@
 rm -rf bin
 mkdir bin
 javac -target 1.1 -source 1.2 ./lib/Zombies.java -d bin/ -cp lib/
+cp media/images/* bin/

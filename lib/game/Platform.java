@@ -13,7 +13,7 @@ import java.net.*;
 
 
 public class Platform extends BufferedApplet {
-	public static boolean DEBUGGING = false;
+	public static boolean DEBUGGING = true;
    int w = 0, h = 0;
    Color bgColor = Color.white;
    Thing selectedThing = null;

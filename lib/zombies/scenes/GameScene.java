@@ -7,6 +7,7 @@ import zombies.*;
 import zombies.guts.*;
 public class GameScene implements IScene{
 	GameEngine engine;
+	ImageThing background;
 	String error;
 	IScene mChild = null, mParent = null;
 	public int buttonStart = 300;
@@ -24,8 +25,14 @@ public class GameScene implements IScene{
 		this.engine = engine;
 	}
 	
+	private void initializeBackground(){
+		background = new ImageThing("background.png", Platform.platform.getWidth(), Platform.platform.getHeight());
+		Platform.platform.addThing(background);
+	}
+	
 	public void setup(){
 		this.sideArea = new SideArea(this);
+		initializeBackground();
 		bottomPanel = new RectThing(0, Platform.platform.getHeight() - 40, Platform.platform.getWidth(), 40);
 		bottomPanel.setColor(Color.white);
 		for(int i = 0; i < 8; i++){
@@ -55,7 +62,7 @@ public class GameScene implements IScene{
 	//This is the simplest implementation of a finish method.
 	public void finish(){
 		Platform.platform.removeThing(bottomPanel);
-		//Platform.platform.removeThing(mBackground);
+		Platform.platform.removeThing(background);
 	}
 	
 	private void updateState(){
@@ -93,25 +100,6 @@ public class GameScene implements IScene{
 				else displayPurchases();
 				handleUserEvents();
 				Tile.showPlayers(state.player.coordinates, state.other.coordinates);
-					
-					/*
-						if canMove()
-							ensure current view == move_view
-							if (playerMoved) // decided by a keypress event
-								engine.doMove()
-					
-						else if canAct()
-							ensure current_view = action_view (has buttons for stuff)
-							for each action_button do
-								if kill -> engine.kill()
-								if sell -> validate selection (loop through each ice-cream selection button and see which are clicked)
-								if buy -> validate purchase, engine.buy!
-						
-						end
-					
-					*/
-					
-
 				
 			}catch(GameServerException ex){
 				System.err.println(ex);
@@ -261,12 +249,6 @@ public class GameScene implements IScene{
 			return false;
 		}
 
-	//private
-
-		private void initializeBackground(){
-			//mBackground = new ImageThing("menubackground.png", Platform.platform.getWidth(), Platform.platform.getHeight());
-			//Platform.platform.addThing(mBackground);
-		}
 
 
 

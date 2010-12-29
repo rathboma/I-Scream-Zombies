@@ -8,9 +8,9 @@ public class MenuScene implements IScene{
 	IScene mChild = null;
 	IScene mParent = null;
 	ArrayList mButtons;
-//	ImageThing mBackground;
+	ImageThing mBackground;
 	MenuThing mStart;
-	String title = "CITYBLOCK";
+	String title = "I SCREAM ZOMBIES";
 	Font mFont;
 
 	public MenuScene(){
@@ -34,7 +34,7 @@ public class MenuScene implements IScene{
 			Thing t = (Thing)mButtons.get(i);
 			Platform.platform.removeThing(t);
 		}
-		//Platform.platform.removeThing(mBackground);
+		Platform.platform.removeThing(mBackground);
 	}
 
 	public void update(){
@@ -44,6 +44,10 @@ public class MenuScene implements IScene{
 
 	public void updateOverlay(Graphics g){
 		g.setColor(Color.white);
+		Font old = g.getFont();
+		g.setFont(new Font("Helvetica", Font.PLAIN, 40));
+		g.drawString(title, 10, 50);
+		g.setFont(old);
 		for(int i = 0; i < mButtons.size(); i++){
 			MenuThing m = (MenuThing)mButtons.get(i);
 			m.updateOverlay(g);
@@ -76,13 +80,14 @@ public class MenuScene implements IScene{
 //private
 
 	private void initializeBackground(){
-		//mBackground = new ImageThing("menubackground.png", Platform.platform.getWidth(), Platform.platform.getHeight());
-		//Platform.platform.addThing(mBackground);
+		mBackground = new ImageThing("main_background.jpg", Platform.platform.getWidth(), Platform.platform.getHeight());
+		Platform.platform.addThing(mBackground);
 	}
 
 	private void initializeButtons(){
 		System.out.println("adding buttons");
-		MenuThing start = new MenuThing(Platform.platform.getWidth() / 2.0, 300, 200, 100, "play");
+		Image image = Platform.platform.getImage(Platform.platform.getBase(), "Button_newgame.png");
+		MenuThing start = new MenuThing(Platform.platform.getWidth() / 2.0, 300, 150, 100, image);
 		Platform.platform.addThing(start);
 		mButtons.add(start);
 		mStart = start;
