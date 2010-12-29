@@ -79,6 +79,10 @@ public class GameScene implements IScene{
 			try{
 				if(!state.player.isTurn()){
 					bigMessage = "Waiting for the other player...";
+					if(state.gameOver){
+						if(state.win) bigMessage = "YOU WIN!";
+						else bigMessage = "YOU LOST! Try again!";
+					}
 					if(engine.checkForTurn()) updateState();
 				}else{
 					bigMessage = "";
@@ -161,8 +165,14 @@ public class GameScene implements IScene{
 				}catch(GameServerException e){
 					sideArea.setError(e.getMessage());
 				}
-				
-			}else if(sideArea.killAttempted()){
+			}else if(sideArea.stayAttempted()){
+				System.out.println("stay attempted!");
+				try{
+					ActionUpdate update = engine.moveTo(state.playerTile());
+					state.mergeUpdate(update);
+				}catch(GameServerException e){
+					sideArea.setError(e.getMessage());
+				}			}else if(sideArea.killAttempted()){
 				try{
 					ActionUpdate update = engine.postKill();
 					state.mergeUpdate(update);

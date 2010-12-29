@@ -9,6 +9,7 @@ public class SideArea{
 	MenuThing kill;
 	MenuThing sell;
 	MenuThing buy;
+	MenuThing stay;
 	Game state;
 	
 	public RectThing background;
@@ -24,9 +25,10 @@ public class SideArea{
 		Platform.platform.addThing(background);
 		this.master = master;
 		move = new MenuThing(background.topLeft().x + 5, Platform.platform.getHeight() - 100, "move");
+		stay = new MenuThing(background.topLeft().x + 120, Platform.platform.getHeight() - 100, "stay");
 		kill = new MenuThing(background.topLeft().x + 5, Platform.platform.getHeight() - 100, "kill");
-		sell = new MenuThing(background.topLeft().x + 105, Platform.platform.getHeight() - 100, "sell");
-		buy = new MenuThing(background.topLeft().x + 210, Platform.platform.getHeight() - 100, "buy");
+		sell = new MenuThing(background.topLeft().x + 110, Platform.platform.getHeight() - 100, "sell");
+		buy = new MenuThing(background.topLeft().x + 220, Platform.platform.getHeight() - 100, "buy");
 
 	}
 	
@@ -49,6 +51,7 @@ public class SideArea{
 	
 	private void validateMove(){
 		Platform.platform.addThing(move);
+		Platform.platform.addThing(stay);
 		Platform.platform.removeThing(kill);
 		Platform.platform.removeThing(sell);
 		Platform.platform.removeThing(buy);
@@ -56,6 +59,7 @@ public class SideArea{
 	
 	private void validateAct(){
 		Platform.platform.removeThing(move);
+		Platform.platform.removeThing(stay);
 		Platform.platform.addThing(kill);
 		Platform.platform.addThing(sell);
 		Platform.platform.addThing(buy);
@@ -66,6 +70,7 @@ public class SideArea{
 		Platform.platform.removeThing(sell);
 		Platform.platform.removeThing(buy);
 		Platform.platform.removeThing(move);
+		Platform.platform.removeThing(stay);
 	}
 	
 	
@@ -98,8 +103,10 @@ public class SideArea{
 		
 		g.setFont(oldFont);
 		
-		if(state.player.canMove)
+		if(state.player.canMove){
 			move.updateOverlay(g);
+			stay.updateOverlay(g);
+		}
 		else if(state.player.canAct){
 			kill.updateOverlay(g);
 			sell.updateOverlay(g);
@@ -115,9 +122,17 @@ public class SideArea{
 	public boolean moveAttempted(){
 		if(move.clicked()) {
 			move.unClick();
+		
 			return true;
 			}
-		return move.clicked();
+		return false;
+	}
+	public boolean stayAttempted(){
+		if(stay.clicked()) {
+			stay.unClick();
+			return true;
+			}
+		return false;
 	}
 	
 	public boolean killAttempted(){

@@ -5,8 +5,8 @@ import java.io.*;
 import java.net.*;
 
 public class JsonFetcher{
-	//String root = "http://iscreamzombies.heroku.com/";
-	String root = "http://localhost:3000/";
+	String root = "http://iscreamzombies.heroku.com/";
+	//String root = "http://localhost:3000/";
 	boolean debug;
 	public String uuid;
 	

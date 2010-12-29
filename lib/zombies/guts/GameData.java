@@ -35,6 +35,8 @@ public class GameData {
 		g.vanillaCost = mData.getJSONObject("costs").getInt("V");
 		g.chocolateCost = mData.getJSONObject("costs").getInt("C");
 		g.strawberryCost = mData.getJSONObject("costs").getInt("S");		
+		g.gameOver = mData.getBoolean("game_over");
+		g.win = mData.getBoolean("win");
 		g.tiles = getTiles();
 		if( mOthers.length() > 0) g.other = Player.basicFromJSON(mOthers.getJSONObject(0));
 		else{

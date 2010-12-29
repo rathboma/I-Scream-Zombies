@@ -8,7 +8,8 @@ public class Game{
 	public double chocolatePrice;
 	public double strawberryPrice;
 	public double vanillaPrice;
-	
+	public boolean gameOver;
+	public boolean win;
 	public int chocolateCost;
 	public int vanillaCost;
 	public int strawberryCost;
