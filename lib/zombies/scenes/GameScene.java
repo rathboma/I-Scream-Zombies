@@ -28,7 +28,7 @@ public class GameScene implements IScene{
 		this.sideArea = new SideArea(this);
 		bottomPanel = new RectThing(0, Platform.platform.getHeight() - 40, Platform.platform.getWidth(), 40);
 		bottomPanel.setColor(Color.white);
-		for(int i = 0; i < 6; i++){
+		for(int i = 0; i < 8; i++){
 			IceCreamButton b = new IceCreamButton();
 			iceButtons.add(b); //shouldn't be more than 6 things to sell...
 			b.setX(sideArea.background.topLeft().x + 5 + 100);
@@ -71,6 +71,8 @@ public class GameScene implements IScene{
 				if(!state.player.isTurn()){
 					bigMessage = "Waiting for the other player...";
 					if(engine.checkForTurn()) updateState();
+				}else{
+					bigMessage = "";
 				}
 				
 				/*

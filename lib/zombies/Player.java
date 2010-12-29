@@ -37,6 +37,7 @@ public class Player{
 		p.coordinates = new Coordinate(json.getInt("x"), json.getInt("y"));
 		p.kills = json.getInt("kills");
 		p.sales = json.getInt("sales");
+		p.money = json.getDouble("money");
 		return p;
 	}
 	
